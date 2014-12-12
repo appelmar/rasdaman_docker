@@ -128,31 +128,19 @@ RUN echo "export RMANHOME=$RMANHOME" >> /etc/profile \
 	
 	
 	
-# SETUP RASGEO EXTENSTION # # DOES NOT WORK YET
+# SETUP RASGEO EXTENSTION # 
 
-#WORKDIR /home/rasdaman/install/applications/rasgeo
-
-#RUN make connectfile
-#RUN sed -i 's/=petauser/=rasdaman/g'  /home/rasdaman/.rasdaman/rasconnect
-#RUN sed -i 's/=petapasswd/=rasdaman/g' /home/rasdaman/.rasdaman/rasconnect
-
-
-
-
-
-
-
+RUN mkdir /home/rasdaman/.rasdaman 
+COPY ./rasconnect /home/rasdaman/.rasdaman/
 
 COPY ./demo.sh /home/rasdaman/
 RUN chmod 0777 /home/rasdaman/demo.sh
 COPY ./supervisord.conf /etc/supervisor/conf.d/
 
-RUN chown -R rasdaman /home/rasdaman
+
 RUN chown -R rasdaman $RMANHOME
-#RUN chown -R tomcat6:tomcat6 /usr/share/tomcat6
-#RUN chown -R tomcat6:tomcat6 $CATALINA_HOME
+RUN chown -R rasdaman /home/rasdaman
 
 EXPOSE 7001 8080 22 5432
-
 
 CMD ["/usr/bin/supervisord"]
