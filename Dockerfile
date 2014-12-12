@@ -2,9 +2,11 @@ FROM ubuntu:12.04
 MAINTAINER Marius Appel <marius.appel@uni-muenster.de>
 
 
-ENV CATALINA_HOME /var/lib/tomcat6/webapps
+ENV CATALINA_HOME /opt/tomcat6
+ENV WEBAPPS_HOME $CATALINA_HOME/webapps
 ENV RMANHOME /opt/rasdaman/
 ENV HOSTNAME rasdaman-dev1
+ENV JAVA_HOME /usr/lib/jvm/java-6-openjdk
 
 RUN locale-gen en_US.UTF-8
 ENV LANG en_US.UTF-8
@@ -46,7 +48,6 @@ RUN apt-get -qq update && apt-get install --fix-missing -y --force-yes \
 	m4 \
 	postgresql-9.1 \
 	openjdk-6-jdk \
-	tomcat6 \
 	libsigsegv-dev \
 	libedit-dev \
 	libtiff-dev \
@@ -60,6 +61,12 @@ RUN apt-get -qq update && apt-get install --fix-missing -y --force-yes \
 	supervisor \
 	net-tools
 
+
+# TODO merge several RUN instructions
+RUN wget -t 3 -w 2 ftp://ftp.fu-berlin.de/unix/www/apache/tomcat/tomcat-6/v6.0.43/bin/apache-tomcat-6.0.43.tar.gz
+
+RUN tar -xzf apache-tomcat-6.0.43.tar.gz
+RUN mv apache-tomcat-6.0.43 /opt/tomcat6
 
 
 
@@ -84,7 +91,7 @@ RUN echo 'StrictHostKeyChecking no' >> /etc/ssh/ssh_config
 RUN mkdir /home/rasdaman/install && git clone -q git://kahlua.eecs.jacobs-university.de/rasdaman.git  /home/rasdaman/install
 WORKDIR /home/rasdaman/install
 #RUN git checkout v9.0.5 # uncomment this if you want a tagged rasdaman version
-RUN autoreconf -fi  && ./configure --prefix=$RMANHOME --with-netcdf --with-hdf4 --with-wardir=$CATALINA_HOME
+RUN autoreconf -fi  && ./configure --prefix=$RMANHOME --with-netcdf --with-hdf4 --with-wardir=$WEBAPPS_HOME
 RUN make 
 RUN make install
 
@@ -114,8 +121,8 @@ RUN /etc/init.d/postgresql start \
 # Add persistent environment variables to container 
 RUN echo "export RMANHOME=$RMANHOME" >> /etc/profile \
 	&& echo "export CATALINA_HOME=$CATALINA_HOME" >> /etc/profile \
-	&& echo "export PATH=\$PATH:$RMANHOME/bin" >> /etc/profile 
-
+	&& echo "export PATH=\$PATH:$RMANHOME/bin" >> /etc/profile \
+	&& echo "export JAVA_HOME=$JAVA_HOME" >> /etc/profile 
 
 
 	
@@ -142,10 +149,10 @@ COPY ./supervisord.conf /etc/supervisor/conf.d/
 
 RUN chown -R rasdaman /home/rasdaman
 RUN chown -R rasdaman $RMANHOME
-
+#RUN chown -R tomcat6:tomcat6 /usr/share/tomcat6
+#RUN chown -R tomcat6:tomcat6 $CATALINA_HOME
 
 EXPOSE 7001 8080 22 5432
 
 
 CMD ["/usr/bin/supervisord"]
-
