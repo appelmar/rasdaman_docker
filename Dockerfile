@@ -136,6 +136,8 @@ COPY ./rasconnect /home/rasdaman/.rasdaman/
 COPY ./demo.sh /home/rasdaman/
 RUN chmod 0777 /home/rasdaman/demo.sh
 COPY ./supervisord.conf /etc/supervisor/conf.d/
+COPY ./pgconfig.sh  /home/rasdaman/pgconfig.sh
+RUN chmod 0777 /home/rasdaman/pgconfig.sh
 
 
 RUN chown -R rasdaman $RMANHOME
