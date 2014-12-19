@@ -45,6 +45,7 @@ RUN apt-get -qq update && apt-get install --fix-missing -y --force-yes \
 	libtiff4-dev \
 	libgdal-dev \
 	libgdal1-dev \
+	gdal-bin \
 	libncurses5-dev \
 	libnetpbm10-dev \
 	libffi-dev \
@@ -67,9 +68,8 @@ RUN apt-get -qq update && apt-get install --fix-missing -y --force-yes \
 	net-tools
 
 
-# TODO merge several RUN instructions
-RUN wget -t 3 -w 2 ftp://ftp.fu-berlin.de/unix/www/apache/tomcat/tomcat-6/v6.0.43/bin/apache-tomcat-6.0.43.tar.gz
 
+RUN wget -t 3 -w 2 ftp://ftp.fu-berlin.de/unix/www/apache/tomcat/tomcat-6/v6.0.43/bin/apache-tomcat-6.0.43.tar.gz
 RUN tar -xzf apache-tomcat-6.0.43.tar.gz
 RUN mv apache-tomcat-6.0.43 /opt/tomcat6
 
