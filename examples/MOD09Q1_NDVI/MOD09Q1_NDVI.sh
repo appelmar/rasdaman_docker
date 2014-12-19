@@ -63,17 +63,20 @@ rasql --user rasadmin --passwd rasadmin -q  'update MOD09Q1_qual as c set c assi
 
 
 
-rasql -q "select tiff(MOD09Q1_red[0:2000,4000:6000]) from MOD09Q1_red" --out file --outfile MD09Q1_red
-sudo cp MD09Q1_red.tif /opt/shared/MD09Q1_red.tif
+rasql -q "select tiff(MOD09Q1_red[0:2000,4000:6000]) from MOD09Q1_red" --out file --outfile MOD09Q1_red
+sudo cp MOD09Q1_red.tif /opt/shared/MOD09Q1_red.tif
 
-rasql -q "select csv(MOD09Q1_red[0:4799,0:9599]) from MOD09Q1_red" --out file --outfile MD09Q1_red
-sudo cp MD09Q1_red.csv /opt/shared/MD09Q1_red.csv
+#rasql -q "select csv(MOD09Q1_red[0:4799,0:9599]) from MOD09Q1_red" --out file --outfile MOD09Q1_red
+#sudo cp MOD09Q1_red.csv /opt/shared/MOD09Q1_red.csv
+
+#rasql -q "select hdf(MOD09Q1_red[0:200,0:200]) from MOD09Q1_red" --out file --outfile MOD09Q1_red
+
 
 rasql -q "select sdom(m) from MOD09Q1_red as m" --out string | grep Result
 
 
-rasql -q "select tiff((nir[0:1000,4000:5000] - red[0:1000,4000:5000]) / (nir[0:1000,4000:5000] + red[0:1000,4000:5000])) from MOD09Q1_red as red, MOD09Q1_nir as nir" --out file --outfile MD09Q1_NDVI
-sudo cp MD09Q1_NDVI.tif /opt/shared/MD09Q1_NDVI.tif
+rasql -q "select tiff((nir[0:1000,4000:5000] - red[0:1000,4000:5000]) / (nir[0:1000,4000:5000] + red[0:1000,4000:5000])) from MOD09Q1_red as red, MOD09Q1_nir as nir" --out file --outfile MOD09Q1_NDVI
+sudo cp MOD09Q1_NDVI.tif /opt/shared/MOD09Q1_NDVI.tif
 
 
 

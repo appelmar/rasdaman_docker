@@ -1,6 +1,11 @@
 FROM ubuntu:12.04
 MAINTAINER Marius Appel <marius.appel@uni-muenster.de>
 
+# TODO:
+# - Add tomcat6 as init.d service, otherwise tomcat doesn't work properly after a running container was stopped abnormally 
+# - Add rasdaman config tool
+# - Set rasdaman log dir and tomcat log dir to shared folder
+# - Allow write access to shared folder for tasdaman user -> chgrp, adduser
 
 ENV CATALINA_HOME /opt/tomcat6
 ENV WEBAPPS_HOME $CATALINA_HOME/webapps
@@ -133,15 +138,22 @@ RUN echo "export RMANHOME=$RMANHOME" >> /etc/profile \
 RUN mkdir /home/rasdaman/.rasdaman 
 COPY ./rasconnect /home/rasdaman/.rasdaman/
 
+
+# COPY SOME UTILITIES AND DEMONSTRATIONS
 COPY ./demo.sh /home/rasdaman/
 RUN chmod 0777 /home/rasdaman/demo.sh
 COPY ./supervisord.conf /etc/supervisor/conf.d/
 COPY ./pgconfig.sh  /home/rasdaman/pgconfig.sh
 RUN chmod 0777 /home/rasdaman/pgconfig.sh
+COPY examples /home/rasdaman/examples
+RUN find /home/rasdaman/examples -type d -exec chmod 0777 {} + && find /home/rasdaman/examples -type f -name "*.sh" -exec chmod 0777 {} + # Make all example scripts executable
+
 
 
 RUN chown -R rasdaman $RMANHOME
 RUN chown -R rasdaman /home/rasdaman
+RUN mkdir /opt/shared # TODO: Add environment variable for shared folder
+RUN chmod -R 0777 /opt/shared # Allow all users writing to shared folder # This does not work yet, maybe rights for volumes are reset during docker run?
 
 EXPOSE 7001 8080 22 5432
 
