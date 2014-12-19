@@ -11,7 +11,7 @@ A Docker image for running Rasdaman including petascope and rasgeo extensions.
 2. Download the source by `git clone https://github.com/mappl/rasdaman_docker`
 3. Make relevant scripts executable `chmod +x install.sh start.sh stop.sh`
 4. If you do not want to use the default settings for docker image and container names, hostnames, and port mapping, you may want to edit the docker run command in install.sh
-5. Run setup.sh `./install.sh`
+5. Run `./install.sh`
 6. The image will be built and a corresponding container will be created automatically. Some first time initializations (e.g. Tomcat web application deployment) will be performed during a first run before the container is finally stopped again.  
 7. You can now start and stop the container whenever you like via `./start.sh` and `./stop.sh` respectively.
 8. Once started, you can log in to the container via ssh using `ssh -p 21210 rasdaman@localhost`
