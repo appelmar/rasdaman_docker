@@ -1,4 +1,4 @@
-#!binbash
+#!/bin/bash
 # Batch script for optimizing postgres parameters based on httprasdaman.orgwikiPerformance
 # Parameters 
 # 1) Available RAM for postgres in MB,
