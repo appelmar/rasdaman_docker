@@ -62,8 +62,8 @@ rasql --user rasadmin --passwd rasadmin -q  'update MOD09Q1_nir as c set c assig
 rasql --user rasadmin --passwd rasadmin -q  'update MOD09Q1_qual as c set c assign shift(inv_tiff($1),[0,4800])' --file temp_h10v10_b03.tif
 
 
-
-rasql -q "select tiff(MOD09Q1_red[0:2000,4000:6000]) from MOD09Q1_red" --out file --outfile MOD09Q1_red
+rasql -q 'select encode(MOD09Q1_red[0:2000,0:2000], "GTiff","xmin=25;ymin=-40;xmax=75;ymax=75;crs=EPSG:4326;INTERLEAVE=BAND" ) from MOD09Q1_red' --out file --outfile MOD09Q1_red
+#rasql -q "select tiff(MOD09Q1_red[*:*,*:*]) from MOD09Q1_red" --out file --outfile MOD09Q1_red
 sudo cp MOD09Q1_red.tif /opt/shared/MOD09Q1_red.tif
 
 #rasql -q "select csv(MOD09Q1_red[0:4799,0:9599]) from MOD09Q1_red" --out file --outfile MOD09Q1_red
