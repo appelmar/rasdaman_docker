@@ -46,6 +46,7 @@ RUN apt-get -qq update && apt-get install --fix-missing -y --force-yes \
 	libgdal-dev \
 	libgdal1-dev \
 	gdal-bin \
+	python-gdal \
 	libncurses5-dev \
 	libnetpbm10-dev \
 	libffi-dev \
@@ -97,6 +98,7 @@ RUN mkdir /home/rasdaman/install && git clone -q git://kahlua.eecs.jacobs-univer
 WORKDIR /home/rasdaman/install
 #RUN git checkout v9.0.5 # uncomment this if you want a tagged rasdaman version
 RUN autoreconf -fi  && ./configure --prefix=$RMANHOME --with-netcdf --with-hdf4 --with-wardir=$WEBAPPS_HOME
+#RUN autoreconf -fi  && ./configure --prefix=$RMANHOME --with-netcdf --with-hdf4 --with-wardir=$WEBAPPS_HOME --with-default-basedb=sqlite #--with-default-basedb=sqlite
 RUN make 
 RUN make install
 
