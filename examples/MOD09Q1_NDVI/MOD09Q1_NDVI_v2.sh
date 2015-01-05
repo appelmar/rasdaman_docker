@@ -49,13 +49,13 @@ wget --retry-connrefused --wait=4 --tries=10 -r -np -nd -nc -p /opt/shared http:
 #rasql --user rasadmin --passwd rasadmin -q "drop collection MOD09Q1_qual" # delete if exists
 
 # import to rasdaman # TODO: Compute shift automatically based on MODIS tile numbers
-rasimport  -f HDF4_EOS:EOS_GRID:"MOD09Q1.A2006217.h10v09.005.2008104035415.hdf":MOD_Grid_250m_Surface_Reflectance:sur_refl_b01 --coll MOD09Q1 --coverage-name MOD09Q1_red -t GreyImage:GreySet --crs-uri 'http://www.opengis.net/def/crs/EPSG/0/5806' --shift 0:0
-rasimport  -f HDF4_EOS:EOS_GRID:"MOD09Q1.A2006217.h10v09.005.2008104035415.hdf":MOD_Grid_250m_Surface_Reflectance:sur_refl_b02 --coll MOD09Q1 --coverage-name MOD09Q1_nir -t GreyImage:GreySet --crs-uri 'http://www.opengis.net/def/crs/EPSG/0/5806' --shift 0:0
-rasimport  -f HDF4_EOS:EOS_GRID:"MOD09Q1.A2006217.h10v09.005.2008104035415.hdf":MOD_Grid_250m_Surface_Reflectance:sur_refl_qc_250m --coll MOD09Q1 --coverage-name MOD09Q1_qual -t GreyImage:GreySet --crs-uri 'http://www.opengis.net/def/crs/EPSG/0/5806' --shift 0:0
+rasimport  -f HDF4_EOS:EOS_GRID:"MOD09Q1.A2006217.h10v09.005.2008104035415.hdf":MOD_Grid_250m_Surface_Reflectance:sur_refl_b01 --coll MOD09Q1 --coverage-name MOD09Q1_red -t ShortImage:ShortSet --crs-uri 'http://www.opengis.net/def/crs/EPSG/0/5806' --shift 0:0
+rasimport  -f HDF4_EOS:EOS_GRID:"MOD09Q1.A2006217.h10v09.005.2008104035415.hdf":MOD_Grid_250m_Surface_Reflectance:sur_refl_b02 --coll MOD09Q1 --coverage-name MOD09Q1_nir -t ShortImage:ShortSet --crs-uri 'http://www.opengis.net/def/crs/EPSG/0/5806' --shift 0:0
+rasimport  -f HDF4_EOS:EOS_GRID:"MOD09Q1.A2006217.h10v09.005.2008104035415.hdf":MOD_Grid_250m_Surface_Reflectance:sur_refl_qc_250m --coll MOD09Q1 --coverage-name MOD09Q1_qual -t UShortImage:UShortSet --crs-uri 'http://www.opengis.net/def/crs/EPSG/0/5806' --shift 0:0
 
-rasimport  -f HDF4_EOS:EOS_GRID:"MOD09Q1.A2006217.h10v10.005.2008104102009.hdf":MOD_Grid_250m_Surface_Reflectance:sur_refl_b01 --coll MOD09Q1 --coverage-name MOD09Q1_red -t GreyImage:GreySet --crs-uri 'http://www.opengis.net/def/crs/EPSG/0/5806' --shift 0:4799
-rasimport  -f HDF4_EOS:EOS_GRID:"MOD09Q1.A2006217.h10v10.005.2008104102009.hdf":MOD_Grid_250m_Surface_Reflectance:sur_refl_b02 --coll MOD09Q1 --coverage-name MOD09Q1_nir -t GreyImage:GreySet --crs-uri 'http://www.opengis.net/def/crs/EPSG/0/5806' --shift 0:4799
-rasimport  -f HDF4_EOS:EOS_GRID:"MOD09Q1.A2006217.h10v10.005.2008104102009.hdf":MOD_Grid_250m_Surface_Reflectance:sur_refl_qc_250m --coll MOD09Q1 --coverage-name MOD09Q1_qual -t GreyImage:GreySet --crs-uri 'http://www.opengis.net/def/crs/EPSG/0/5806' --shift 0:4799
+rasimport  -f HDF4_EOS:EOS_GRID:"MOD09Q1.A2006217.h10v10.005.2008104102009.hdf":MOD_Grid_250m_Surface_Reflectance:sur_refl_b01 --coll MOD09Q1 --coverage-name MOD09Q1_red -t ShortImage:ShortSet --crs-uri 'http://www.opengis.net/def/crs/EPSG/0/5806' --shift 0:4799
+rasimport  -f HDF4_EOS:EOS_GRID:"MOD09Q1.A2006217.h10v10.005.2008104102009.hdf":MOD_Grid_250m_Surface_Reflectance:sur_refl_b02 --coll MOD09Q1 --coverage-name MOD09Q1_nir -t ShortImage:ShortSet --crs-uri 'http://www.opengis.net/def/crs/EPSG/0/5806' --shift 0:4799
+rasimport  -f HDF4_EOS:EOS_GRID:"MOD09Q1.A2006217.h10v10.005.2008104102009.hdf":MOD_Grid_250m_Surface_Reflectance:sur_refl_qc_250m --coll MOD09Q1 --coverage-name MOD09Q1_qual -t UShortImage:UShortSet --crs-uri 'http://www.opengis.net/def/crs/EPSG/0/5806' --shift 0:4799
 
 
 
