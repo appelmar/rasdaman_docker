@@ -15,7 +15,7 @@ rasdl -r /home/rasdaman/examples/TRMM_3B43_ANOM/TRMM.dl -i # Add data types for 
 
 # Create collection for 3 bands
 rasql --user rasadmin --passwd rasadmin -q "drop collection TRMM" # delete if exists
-rasql --user rasadmin --passwd rasadmin -q "create collection TRMM FloatSet3" 
+rasql --user rasadmin --passwd rasadmin -q "create collection TRMM TRMM_stack" 
 rasql --user rasadmin --passwd rasadmin -q "insert into TRMM values marray it in [0:0,0:0,0:0] values struct {0f,0f,0f}" 
 
 
@@ -56,7 +56,7 @@ gdal_merge.py -separate temp_20030601_b01.tif temp_20030601_b02.tif temp_2003060
 
 
 
-rasql --user rasadmin --passwd rasadmin -q  'update TRMM as c set c[*:*,*:*,1] assign decode($1)' --file temp_20030401.tif # April
+rasql --user rasadmin --passwd rasadmin -q  'update TRMM as c set c[*:*,*:*,1] assign (float)inv_tiff($1, "sampletype=float")' --file temp_20030401.tif # April
 rasql --user rasadmin --passwd rasadmin -q  'update TRMM as c set c[*:*,*:*,2] assign decode($1)' --file temp_20030501.tif # May
 rasql --user rasadmin --passwd rasadmin -q  'update TRMM as c set c[*:*,*:*,3] assign decode($1)' --file temp_20030601.tif # June
 rasql --user rasadmin --passwd rasadmin -q 'commit'
