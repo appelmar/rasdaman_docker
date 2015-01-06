@@ -27,7 +27,7 @@ rasdl -r /home/rasdaman/examples/MOD09Q1_NDVI/MOD09Q1.dl -i # Add data types for
 # Create collection for 3 bands
 rasql --user rasadmin --passwd rasadmin -q "drop collection MOD09Q1" # delete if exists
 rasql --user rasadmin --passwd rasadmin -q "create collection MOD09Q1 MOD09Q1_image_set" 
-rasql --user rasadmin --passwd rasadmin -q "insert into MOD09Q1 values marray it in [0:0,0:0] values struct {0s,0s,0us}" 
+rasql --user rasadmin --passwd rasadmin -q "insert into MOD09Q1 values marray it in [0:0,0:0] values struct {0s,0s,0us} tiling regular [0:511,0:511] index rpt_index" 
 
 
 # Create separate collections for 3 bands
@@ -82,8 +82,10 @@ gdal_merge.py -separate temp_h10v10_b01.tif temp_h10v10_b02.tif temp_h10v10_b03.
 rasql --user rasadmin --passwd rasadmin -q  'update MOD09Q1 as c set c assign shift(inv_tiff($1),[0,0])' --file temp_h10v09.tif
 rasql --user rasadmin --passwd rasadmin -q  'update MOD09Q1 as c set c assign shift(inv_tiff($1),[0,4800])' --file temp_h10v10.tif
 #rasql -q 'select encode(img[0:4000,0:4000].red, "GTiff") from MOD09Q1 as img' --out file --outfile MOD09Q1
+rasql -q 'select encode(img[0:*,0:*].red, "GTiff") from MOD09Q1 as img' --out file --outfile MOD09Q1 # BUG, does not work for large arrays (only up to approx. 1000x1000)
 
-#rasql -q 'select encode((float)((img[0:1000,3000:5000].nir - img[0:1000,3000:5000].red)/(img[0:1000,3000:5000].red+img[0:1000,3000:5000].nir)), "GTiff") from MOD09Q1 as img' --out file --outfile MOD09Q1_NDVI
+
+#rasql -q 'select encode((float)((img[0:4000,3000:5000].nir - img[0:4000,3000:5000].red)/(img[0:4000,3000:5000].red+img[0:4000,3000:5000].nir)), "GTiff") from MOD09Q1 as img' --out file --outfile MOD09Q1_NDVI
 rasql -q 'select encode((float)((img[0:1000,0:1000].nir - img[0:1000,0:1000].red)/(img[0:1000,0:1000].red+img[0:1000,0:1000].nir)), "GTiff") from MOD09Q1 as img' --out file --outfile MOD09Q1_NDVI
 # TODO: NaN treatment: NIR and RED in -100–16000, fill value -28672 
 sudo cp MOD09Q1_NDVI.tif /opt/shared/

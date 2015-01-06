@@ -146,6 +146,7 @@ COPY ./demo.sh /home/rasdaman/
 RUN chmod 0777 /home/rasdaman/demo.sh
 COPY ./container_startup.sh /opt/
 RUN chmod 0777 /opt/container_startup.sh
+COPY ./rasmgr.conf $RMANHOME/etc/
 COPY ./supervisord.conf /etc/supervisor/conf.d/
 COPY ./pgconfig.sh  /home/rasdaman/pgconfig.sh
 RUN chmod 0777 /home/rasdaman/pgconfig.sh
