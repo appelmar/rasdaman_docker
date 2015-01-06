@@ -1,0 +1,6 @@
+
+struct TRMM_pixel {float precipitation; float relativeError; char gaugeRelativeWeighting;}; // Pixel type of TRMM images
+typedef marray <TRMM_pixel , 2>   TRMM_image; // Two-dimensional (fixed time) TRMM array without bounds
+typedef marray <TRMM_pixel , 3>   TRMM_stack; // Three-dimensional spatiotemporal TRMM stack
+typedef set <TRMM_image> TRMM_image_set;
+typedef set <TRMM_stack> TRMM_stack_set;

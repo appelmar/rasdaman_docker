@@ -172,3 +172,58 @@ sudo cp MOD09Q1_NDVI.tif /opt/shared/
 # echo $(( $VTILE * TILEHEIGHT ))
 
 
+
+
+
+
+
+
+################################################################################################################################## 2015/01/06
+# #!/bin/bash
+
+
+
+# TILEWIDTH=4800
+# TILEHEIGHT=4800
+
+# HTILES=$(seq -w 9 1 10 ) # tiles 09-10
+# VTILES=$(seq -w 9 1 10 ) # tiles 09-10
+# YEARS=$(seq 2002 1 2002) # only 2002
+# DAYS=$(seq -w 100 1 130) # only 121
+
+
+# #HTILES=$(seq -w 9 1 12 )
+# #VTILES=$(seq -w 9 1 12 )
+
+# #YEARS=$(seq 1998 1 2006)
+# #DAYS=$(seq -w 1 1 365)
+
+
+# function join { local IFS="$1"; shift; echo "$*"; }
+# YEARS_PATTERN=[$(join , $YEARS)]
+# HTILE_PATTERN=[$(join , $HTILES)]
+# VTILE_PATTERN=[$(join , $VTILES)]
+
+# #DAYARR=( $DAYS )
+# #STARTDAY=${DAYARR[0]}
+# #ENDDAY=${DAYARR[${#DAYARR[@]} - 1]}
+# #DAY_PATTERN="[$STARTDAY-$ENDDAY]"
+# DAY_PATTERN=[$(join , $DAYS)]
+
+
+# #echo $YEARS_PATTERN
+# #echo $HTILE_PATTERN
+# #echo $VTILE_PATTERN
+# #echo $DAY_PATTERN
+
+
+# #echo "MOD09Q1.${YEARS_PATTERN}${DAY_PATTERN}.h${HTILE_PATTERN}v${VTILE_PATTERN}*.hdf http://e4ftl01.cr.usgs.gov/MOLT/MOD09Q1.005/{1}.{2}.{3}/ ::: $YEARS ::: $( seq -w 1 1 12 )::: $( seq -w 1 1 31 ) "
+
+ # wget -r -np --retry-connrefused --wait=1 --accept "MOD09Q1.${YEARS_PATTERN}${DAY_PATTERN}.h${HTILE_PATTERN}v${VTILE_PATTERN}*.hdf" http://e4ftl01.cr.usgs.gov/MOLT/MOD09Q1.005/{1}.{2}.{3}/ ::: $YEARS ::: $( seq -w 1 1 12 ) ::: $( seq -w 1 1 31 )
+
+
+
+##################################################################################################################################
+
+
+
