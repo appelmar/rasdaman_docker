@@ -18,7 +18,7 @@ then
 fi
 
 docker stop $CONTAINER_TAG
-#docker rm $CONTAINER_TAG
+docker rm $CONTAINER_TAG
 #docker rmi $IMAGE_TAG
 docker build --rm=false --tag="$IMAGE_TAG" . && echo "Docker image $IMAGE_TAG build successfully!"
 rm -R -f ~/docker.${CONTAINER_TAG}
