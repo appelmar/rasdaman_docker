@@ -20,14 +20,14 @@ rasql --user rasadmin --passwd rasadmin -q "insert into TRMM values marray it in
 
 
 
-YEARS=( 1998 1999 2000 2001 2002 2003 2004 2005 2006 )
-MONTHS=( 4 5 6 7 )
+# YEARS=( 1998 1999 2000 2001 2002 2003 2004 2005 2006 )
+# MONTHS=( 4 5 6 7 )
 
-NYEARS=${#YEARS[@]}
-NMONTHS=${#MONTHS[@]}
+# NYEARS=${#YEARS[@]}
+# NMONTHS=${#MONTHS[@]}
 
-echo $NYEARS
-echo $NMONTHS
+# echo $NYEARS
+# echo $NMONTHS
 
 
 
@@ -93,12 +93,20 @@ rasql --user rasadmin --passwd rasadmin -q 'commit'
 rasql -q 'select sdom(s) from TRMM as s' --out string | grep Result
 
 rasql -q 'select encode(img[*:*,*:*,1].precipitation, "GTiff") from TRMM as img' --out file --outfile TRMM1 
+rasql -q 'select encode(img[*:*,*:*,2].precipitation, "GTiff") from TRMM as img' --out file --outfile TRMM2 
+rasql -q 'select encode(img[*:*,*:*,3].precipitation, "GTiff") from TRMM as img' --out file --outfile TRMM3 
 rasql -q 'select encode(img[*:*,*:*,1].gaugeRelativeWeighting, "GTiff") from TRMM as img' --out file --outfile TRMM3 
 sudo cp TRMM3.tif /opt/shared/
 
 # This seems to be working:
 # Average
-rasql -q 'select encode(marray prec in [ sdom(TRMM)[0].lo:sdom(TRMM)[0].hi, sdom(TRMM)[1].lo:sdom(TRMM)[1].hi ] values condense + over x in [sdom(TRMM)[2].lo:sdom(TRMM)[2].hi] using TRMM[prec[0], prec[1], x[0]].precipitation / 3f , "GTiff") from TRMM' --out file --outfile TRMM_avg
+rasql -q 'select encode(marray prec in [ sdom(TRMM)[0].lo:sdom(TRMM)[0].hi, sdom(TRMM)[1].lo:sdom(TRMM)[1].hi ] values condense + over x in [sdom(TRMM)[2].lo:sdom(TRMM)[2].hi] using TRMM[prec[0], prec[1], x[0]].precipitation / 3f , "GTiff") from TRMM' --out file --outfile TRMM_avg_0
+
+
+# much nicer but takes some time?! Tiff image not readable
+rasql -q 'select  encode(marray prec in [ sdom(TRMM)[0].lo:sdom(TRMM)[0].hi, sdom(TRMM)[1].lo:sdom(TRMM)[1].hi ] values avg_cells(TRMM[prec[0], prec[1], *:*].precipitation)  , "GTiff") from TRMM' --out file --outfile TRMM_avg
+
+
 
 # CHECK, the following queries should return equal results
 rasql -q 'select (marray prec in [ sdom(TRMM)[0].lo:sdom(TRMM)[0].hi, sdom(TRMM)[1].lo:sdom(TRMM)[1].hi ] values condense + over x in [sdom(TRMM)[2].lo:sdom(TRMM)[2].hi] using TRMM[prec[0], prec[1], x[0]].precipitation)[1,1] from TRMM' --out string
@@ -116,6 +124,31 @@ rasql -q 'select TRMM[1,1,1].precipitation + TRMM[1,1,2].precipitation + TRMM[1,
 #rasql --user rasadmin --passwd rasadmin -q "insert into TRMM_PREC_AVG values marray prec in [ sdom(TRMM)[0].lo:sdom(TRMM)[0].hi, sdom(TRMM)[1].lo:sdom(TRMM)[1].hi ] values condense + over x in [sdom(TRMM)[2].lo:sdom(TRMM)[2].hi] using TRMM[prec[0], prec[1], x[0]].precipitation / 3f" 
 
 
+# Question: Does rasdaman count unused dimension indexes (e.g. temporal gaps in image stacks) in condense operations ????
+# Experiment: 
+
+rasql --user rasadmin --passwd rasadmin -q "create collection TEST_COLL FloatSet3" 
+rasql --user rasadmin --passwd rasadmin -q "insert into TEST_COLL values marray it in [0:0,0:0,0:0] values 0f" 
+rasql --user rasadmin --passwd rasadmin -q "update TEST_COLL as c set c assign marray prec in [0:1, 0:1, 1] values 1f"
+rasql --user rasadmin --passwd rasadmin -q "update TEST_COLL as c set c assign marray prec in [0:1, 0:1, 3] values 1f"
+rasql --user rasadmin --passwd rasadmin -q "update TEST_COLL as c set c assign marray prec in [0:1, 0:1, 5] values 1f"
+rasql -q "select (marray TEST_SUM in [0:1, 0:1] values condense + over x in [sdom(TEST_COLL)[2].lo : sdom(TEST_COLL)[2].hi] using TEST_COLL[1,1,x[0]])[1,1] from TEST_COLL" --out string
+# Expected output 3 -> TRUE
+rasql -q "select add_cells(TEST_COLL[1,1,*:*]) from TEST_COLL" --out string
+# Expected output 3 -> TRUE
+rasql -q "select add_cells(TEST_COLL[1,1,*:*]) from TEST_COLL" --out string
+# Expected output 3 -> TRUE
+rasql -q "select min_cells(TEST_COLL[1,1,*:*]) from TEST_COLL" --out string
+rasql -q "select avg_cells(TEST_COLL[1,1,*:*]) from TEST_COLL" --out string # -> 0.5 INCLUDES UNUSED DIMENSION VALUES!!!!!!!!
+rasql -q "select TEST_COLL[1,1,2] from TEST_COLL" --out string 
+rasql -q "select TEST_COLL[1,1,2] from TEST_COLL" --out string # -> 0
+rasql -q "select TEST_COLL[1,1,27] from TEST_COLL" --out string # -> 0
+##### END EXPERIMENT
+
+# Question: How to access number of true dimension indices instead of sdom()
+
+
+
 # Stddev # this becomes ugly without storing avg as intermediate result array...
 # First try: mean absolute error
 # WARNING: Running the following command will cause a long-running rasserver process with increasing memory consumption until it finally crashes
@@ -127,10 +160,38 @@ rasql -q 'select encode(
 		((marray prec_avg in [ sdom(TRMM)[0].lo:sdom(TRMM)[0].hi, sdom(TRMM)[1].lo:sdom(TRMM)[1].hi ] 
 		values condense + over x in [sdom(TRMM)[2].lo:sdom(TRMM)[2].hi] using TRMM[prec_avg[0], prec_avg[1], x[0]].precipitation / 3f )[prec_stdev[0], prec_stdev[1]])) / 3f, "GTiff") from TRMM' --out file --outfile TRMM_avg
 		
+		
+
+
+		
+# Much nicer but also affected to memory / crash behavior
+rasql -q 'select encode(marray prec_mae in [ sdom(TRMM)[0].lo:sdom(TRMM)[0].hi, sdom(TRMM)[1].lo:sdom(TRMM)[1].hi ] values condense + over y in [sdom(TRMM)[2].lo:sdom(TRMM)[2].hi] using TRMM[prec_mae[0], prec_mae[1], y[0]].precipitation - avg_cells(TRMM[prec_mae[0], prec_mae[1], *:*] ) / 3f, "GTiff") from TRMM' --out file --outfile TRMM_mae
+	
+# test with limited number of pixels
+rasql -q 'select encode(marray prec_mae in [ 1:50, 1:50] values condense + over y in [1:3] using TRMM[prec_mae[0], prec_mae[1], y[0]].precipitation - avg_cells(TRMM[prec_mae[0], prec_mae[1], *:*] ) / 3f, "GTiff") from TRMM' --out file --outfile TRMM_mae
+
+
+
+		
 rasql -q 'select encode(marray prec_stdev in [ sdom(TRMM)[0].lo:sdom(TRMM)[0].hi, sdom(TRMM)[1].lo:sdom(TRMM)[1].hi ] values condense + over y in [sdom(TRMM)[2].lo:sdom(TRMM)[2].hi] using (TRMM[prec_stdev[0], prec_stdev[1], y[0]].precipitation - ((marray prec_avg in [ sdom(TRMM)[0].lo:sdom(TRMM)[0].hi, sdom(TRMM)[1].lo:sdom(TRMM)[1].hi ] values condense + over x in [sdom(TRMM)[2].lo:sdom(TRMM)[2].hi] using TRMM[prec_avg[0], prec_avg[1], x[0]].precipitation / 3f )[prec_stdev[0], prec_stdev[1]])) / 3f, "GTiff") from TRMM' --out file --outfile TRMM_avg
 			
 		
 		
+	
+	
+	
+	
+	
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 
 
