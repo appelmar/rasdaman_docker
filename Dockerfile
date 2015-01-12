@@ -66,7 +66,8 @@ RUN apt-get -qq update && apt-get install --fix-missing -y --force-yes \
 	libsigsegv-dev \
 	vim \
 	supervisor \
-	net-tools
+	net-tools \
+	r-base
 
 
 

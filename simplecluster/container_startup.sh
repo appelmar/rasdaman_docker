@@ -3,9 +3,9 @@
 echo -e "\n\nStarting required services..."
 /usr/sbin/sshd -D >/dev/null &
 echo -e "... sshd started"
-/etc/init.d/postgresql start >/dev/null
-sleep 2
-echo -e "... postgresql started"
+#/etc/init.d/postgresql start >/dev/null
+#sleep 2
+#echo -e "... postgresql started"
 su - rasdaman -c"/opt/rasdaman/bin/start_rasdaman.sh" >/dev/null
 sleep 5
 echo -e "... rasdaman started"

@@ -20,3 +20,7 @@ rasql --user rasadmin --passwd rasadmin -q 'select (marray mean in [0:999,0:999]
 rasql --user rasadmin --passwd rasadmin -q 'select encode(marray variance in [0:999,0:999] values condense + over y in [1:3] using (TestColl[variance[0], variance[1], y[0]] - avg_cells(TestColl[variance[0], variance[1], 1:3])) * (TestColl[variance[0], variance[1], y[0]] - avg_cells(TestColl[variance[0], variance[1], 1:3])) / 2f,"GTiff") from TestColl' --out file --outfile test_var
 
 rasql --user rasadmin --passwd rasadmin -q 'select (marray variance in [0:999,0:999] values condense + over y in [1:3] using (TestColl[variance[0], variance[1], y[0]] - avg_cells(TestColl[variance[0], variance[1], 1:3])) * (TestColl[variance[0], variance[1], y[0]] - avg_cells(TestColl[variance[0], variance[1], 1:3])) / 2f)[1,1] from TestColl' --out string
+
+
+
+rasql --user rasadmin --passwd rasadmin -q 'select (marray variance in [0:999,0:999] values condense + over y in [0:3] using (TestColl[variance[0], variance[1], y[0]] - avg_cells(TestColl[variance[0], variance[1], 0:3])) * (TestColl[variance[0], variance[1], y[0]] - avg_cells(TestColl[variance[0], variance[1], 0:3])) / 2f) from TestColl' --out string

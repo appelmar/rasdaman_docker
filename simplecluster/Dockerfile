@@ -10,7 +10,7 @@ MAINTAINER Marius Appel <marius.appel@uni-muenster.de>
 ENV CATALINA_HOME /opt/tomcat6
 ENV WEBAPPS_HOME $CATALINA_HOME/webapps
 ENV RMANHOME /opt/rasdaman/
-ENV HOSTNAME rasdaman-dev1
+#ENV HOSTNAME rasdaman-dev1
 ENV JAVA_HOME /usr/lib/jvm/java-6-openjdk
 
 RUN locale-gen en_US.UTF-8
@@ -113,13 +113,13 @@ RUN sed -i 's!/home/rasdaman/install!$RMANHOME!' $RMANHOME/bin/update_petascoped
 
 
 # Adjust PostgreSQL configuration
-RUN echo "host all  all    127.0.0.1/32   trust" >> /etc/postgresql/9.1/main/pg_hba.conf
-#RUN echo "host all  all    0.0.0.0/0   trust" >> /etc/postgresql/9.1/main/pg_hba.conf # only for debugging!!!
-RUN echo "local all  all      peer" >> /etc/postgresql/9.1/main/pg_hba.conf
-RUN echo "listen_addresses='*'" >> /etc/postgresql/9.1/main/postgresql.conf # should be replaced with localhost in production
-RUN /etc/init.d/postgresql start \
-	&& su - postgres -c"psql -c\"CREATE ROLE rasdaman SUPERUSER LOGIN CREATEROLE CREATEDB UNENCRYPTED PASSWORD 'rasdaman';\"" \
-	&& su - rasdaman -c"$RMANHOME/bin/create_db.sh" && su - rasdaman -c"$RMANHOME/bin/update_petascopedb.sh"
+#RUN echo "host all  all    127.0.0.1/32   trust" >> /etc/postgresql/9.1/main/pg_hba.conf
+##RUN echo "host all  all    0.0.0.0/0   trust" >> /etc/postgresql/9.1/main/pg_hba.conf # only for debugging!!!
+#RUN echo "local all  all      peer" >> /etc/postgresql/9.1/main/pg_hba.conf
+#RUN echo "listen_addresses='*'" >> /etc/postgresql/9.1/main/postgresql.conf # should be replaced with localhost in production
+#RUN /etc/init.d/postgresql start \
+#	&& su - postgres -c"psql -c\"CREATE ROLE rasdaman SUPERUSER LOGIN CREATEROLE CREATEDB UNENCRYPTED PASSWORD 'rasdaman';\"" \
+#	&& su - rasdaman -c"$RMANHOME/bin/create_db.sh" && su - rasdaman -c"$RMANHOME/bin/update_petascopedb.sh"
 
 
 
@@ -148,10 +148,8 @@ COPY ./container_startup.sh /opt/
 RUN chmod 0777 /opt/container_startup.sh
 COPY ./rasmgr.conf $RMANHOME/etc/
 COPY ./supervisord.conf /etc/supervisor/conf.d/
-COPY ./pgconfig.sh  /home/rasdaman/pgconfig.sh
-RUN chmod 0777 /home/rasdaman/pgconfig.sh
-COPY ../examples /home/rasdaman/examples
-RUN find /home/rasdaman/examples -type d -exec chmod 0777 {} + && find /home/rasdaman/examples -type f -name "*.sh" -exec chmod 0777 {} + # Make all example scripts executable
+#COPY ../examples /home/rasdaman/examples
+#RUN find /home/rasdaman/examples -type d -exec chmod 0777 {} + && find /home/rasdaman/examples -type f -name "*.sh" -exec chmod 0777 {} + # Make all example scripts executable
 
 
 
@@ -160,6 +158,6 @@ RUN chown -R rasdaman /home/rasdaman
 RUN mkdir /opt/shared # TODO: Add environment variable for shared folder
 RUN chmod -R 0777 /opt/shared # Allow all users writing to shared folder # This does not work yet, maybe rights for volumes are reset during docker run?
 
-EXPOSE 7001 8080 22 5432
+EXPOSE 7001 8080 22
 
 CMD ["/usr/bin/supervisord"]
