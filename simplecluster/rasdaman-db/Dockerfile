@@ -2,6 +2,7 @@ FROM ubuntu:12.04
 MAINTAINER Marius Appel <marius.appel@uni-muenster.de>
 
 
+ENV RMANHOME /opt/rasdaman/
 ENV HOSTNAME rasdaman-db
 
 RUN locale-gen en_US.UTF-8
@@ -16,9 +17,49 @@ RUN apt-get -qq update && apt-get install --fix-missing -y --force-yes \
 	ssh \
 	openssh-server \
 	sudo \
+	wget \
+	gdebi \
+	git \
+	git-core \
+	make \
+	autoconf \
+	automake \
+	libtool \
+	gawk \
+	flex \
+	bison \
+	g++ \
+	doxygen \
+	ant \
+	autotools-dev \
+	comerr-dev \
+	libecpg-dev \
+	libtiff4-dev \
+	libgdal-dev \
+	libgdal1-dev \
+	gdal-bin \
+	python-gdal \
+	libncurses5-dev \
+	libnetpbm10-dev \
+	libffi-dev \
+	libreadline-dev \
+	libtool \
+	m4 \
 	postgresql-9.1 \
+	openjdk-6-jdk \
+	libsigsegv-dev \
+	libedit-dev \
+	libtiff-dev \
+	libjpeg8-dev \
+	libpng12-dev \
+	libnetpbm10-dev \
+	libhdf4-alt-dev \
+	libnetcdf-dev \
+	libsigsegv-dev \
 	vim \
-	supervisor 
+	supervisor \
+	net-tools
+
 
 
 
@@ -40,14 +81,39 @@ RUN echo 'StrictHostKeyChecking no' >> /etc/ssh/ssh_config
 
 
 
+# Download and build rasdaman
+RUN mkdir /home/rasdaman/install && git clone -q git://kahlua.eecs.jacobs-university.de/rasdaman.git  /home/rasdaman/install
+WORKDIR /home/rasdaman/install
+#RUN git checkout v9.0.5 # uncomment this if you want a tagged rasdaman version
+RUN autoreconf -fi  && ./configure --prefix=$RMANHOME 
+RUN make 
+RUN make install
+
+
+
+# Some neccessary rasdaman adjustments
+RUN sed -i 's/=petauser/=rasdaman/g' $RMANHOME/etc/petascope.properties
+RUN sed -i 's/=petapasswd/=rasdaman/g' $RMANHOME/etc/petascope.properties
+RUN sed -i 's!petascope.log!/tmp/petascope.log!' $RMANHOME/etc/log4j.properties
+RUN sed -i 's!/home/rasdaman/install!$RMANHOME!' $RMANHOME/bin/update_petascopedb.sh
+
+
+
 # Adjust PostgreSQL configuration
-RUN echo "host all  all    0.0.0.0/0   trust" >> /etc/postgresql/9.1/main/pg_hba.conf 
+#RUN echo "host all  all    127.0.0.1/32   trust" >> /etc/postgresql/9.1/main/pg_hba.conf
+RUN echo "host all  all    0.0.0.0/0   trust" >> /etc/postgresql/9.1/main/pg_hba.conf # only for debugging!!!
 RUN echo "local all  all      peer" >> /etc/postgresql/9.1/main/pg_hba.conf
 RUN echo "listen_addresses='*'" >> /etc/postgresql/9.1/main/postgresql.conf # should be replaced with localhost in production
-RUN /etc/init.d/postgresql start 
+RUN /etc/init.d/postgresql start \
+	&& su - postgres -c"psql -c\"CREATE ROLE rasdaman SUPERUSER LOGIN CREATEROLE CREATEDB UNENCRYPTED PASSWORD 'rasdaman';\"" \
+	&& su - rasdaman -c"$RMANHOME/bin/create_db.sh" && su - rasdaman -c"$RMANHOME/bin/update_petascopedb.sh"
 
 
 
+
+
+
+# COPY SOME UTILITIES AND DEMONSTRATIONS
 COPY ./container_startup.sh /opt/
 RUN chmod 0777 /opt/container_startup.sh
 COPY ./supervisord.conf /etc/supervisor/conf.d/
