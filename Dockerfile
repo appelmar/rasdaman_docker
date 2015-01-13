@@ -67,7 +67,8 @@ RUN apt-get -qq update && apt-get install --fix-missing -y --force-yes \
 	vim \
 	supervisor \
 	net-tools \
-	r-base
+	r-base \
+	parallel
 
 
 
