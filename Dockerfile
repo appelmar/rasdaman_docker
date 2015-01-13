@@ -67,8 +67,7 @@ RUN apt-get -qq update && apt-get install --fix-missing -y --force-yes \
 	vim \
 	supervisor \
 	net-tools \
-	r-base \
-	parallel
+	r-base 
 
 
 
@@ -104,6 +103,12 @@ RUN autoreconf -fi  && ./configure --prefix=$RMANHOME --with-netcdf --with-hdf4 
 RUN make 
 RUN make install
 
+
+# Install gnu-parallel
+RUN wget http://git.savannah.gnu.org/cgit/parallel.git/plain/src/parallel
+RUN chmod 755 parallel
+RUN cp parallel sem
+RUN sudo mv parallel sem /usr/bin/ 
 
 
 # Some neccessary rasdaman adjustments
