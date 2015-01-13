@@ -10,7 +10,7 @@ system("rasql --user rasadmin --passwd rasadmin -q  'update TestColl as c set c[
 system("rasql --user rasadmin --passwd rasadmin -q  'update TestColl as c set c[0:999, 0:999, 3] assign marray v in [0:999, 0:999] values 3f'",ignore.stdout = TRUE, ignore.stderr = TRUE)
 
 
-Sys.setenv("RASLOGIN=rasadmin:d293a15562d3e70b6fdc5ee452eaed40")
+Sys.setenv(RASLOGIN = "rasadmin:d293a15562d3e70b6fdc5ee452eaed40")
 
 system("rascontrol -q -x down srv -all",ignore.stdout = TRUE, ignore.stderr = TRUE)
 Sys.sleep(5)
@@ -27,7 +27,7 @@ NSERVERMAX = 10
 
 
 for (i in 1:NSERVERMAX) {
-	system(paste("define srv TEST", i ," -host rasdaman-dev1 -type n -port 7009 -dbh rasdaman_host -countdown 200 -autorestart on -xp --timeout 300 --cachelimit 67108864", sep=""),ignore.stdout = TRUE, ignore.stderr = TRUE) # 64 MB default cache size
+	system(paste("rascontrol -x define srv TEST", i ," -host rasdaman-dev1 -type n -port 7009 -dbh rasdaman_host -countdown 200 -autorestart on -xp --timeout 300 --cachelimit 67108864", sep=""),ignore.stdout = TRUE, ignore.stderr = TRUE) # 64 MB default cache size
 }
 
 
