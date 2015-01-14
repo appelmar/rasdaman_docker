@@ -4,7 +4,7 @@ A Docker image for running Rasdaman including petascope and rasgeo extensions.
 
 # Prerequisites
 - Docker.io 
-- At least 10 gigabytes of secondary storage
+- At least 16 gigabytes free disk space
 
 # Instructions
 1. If not yet done, install Docker, e.g. by `sudo apt-get update && sudo apt-get install docker.io`
