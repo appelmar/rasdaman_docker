@@ -2,10 +2,7 @@ FROM ubuntu:12.04
 MAINTAINER Marius Appel <marius.appel@uni-muenster.de>
 
 # TODO:
-# - Add tomcat6 as init.d service, otherwise tomcat doesn't work properly after a running container was stopped abnormally 
-# - Add rasdaman config tool
 # - Set rasdaman log dir and tomcat log dir to shared folder
-# - Allow write access to shared folder for tasdaman user -> chgrp, adduser
 
 ENV CATALINA_HOME /opt/tomcat6
 ENV WEBAPPS_HOME $CATALINA_HOME/webapps
@@ -66,7 +63,6 @@ RUN apt-get -qq update && apt-get install --fix-missing -y --force-yes \
 	libsigsegv-dev \
 	vim \
 	supervisor \
-	net-tools \
 	r-base 
 
 

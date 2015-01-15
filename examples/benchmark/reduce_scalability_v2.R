@@ -1,8 +1,8 @@
 
-ITERATIONS = 3 #5
+ITERATIONS = 5 #5
 NQUERYMAX = 10 #10 <= NSERVER
 NT = 100   # 30
-NM = 100 # 500
+NM = 200 # 500
 NSERVER= 10
 VERBOSE=T
 
@@ -34,22 +34,39 @@ system("rascontrol -q -x down srv N9 -kill",ignore.stdout = !VERBOSE, ignore.std
 Sys.sleep(3)
 
 
-for (i in 1:NSERVER) {
-	# using tile cache leads to segfault errors -> set to 0 (default)
-	# Beware of already open ports of other services (e.g Tomcat!)
-	system(paste("rascontrol -q -x define srv TEST", i ," -host rasdaman-dev1 -type n -port ", 9001 + i , " -dbh rasdaman_host", sep=""),ignore.stdout = !VERBOSE, ignore.stderr = !VERBOSE) # 64 MB default cache size
-	system(paste("rascontrol -q -x change srv TEST", i ," -countdown 200 -autorestart on", sep=""),ignore.stdout = !VERBOSE, ignore.stderr = !VERBOSE) # 64 MB default cache size
-	Sys.sleep(0.5)
+
+start_servers <- function() {
+	for (i in 1:NSERVER) {
+		# using tile cache leads to segfault errors -> set to 0 (default)
+		# Beware of already open ports of other services (e.g Tomcat!)
+		system(paste("rascontrol -q -x define srv TEST", i ," -host rasdaman-dev1 -type n -port ", 9001 + i , " -dbh rasdaman_host", sep=""),ignore.stdout = !VERBOSE, ignore.stderr = !VERBOSE) # 64 MB default cache size
+		system(paste("rascontrol -q -x change srv TEST", i ," -countdown 200 -autorestart on", sep=""),ignore.stdout = !VERBOSE, ignore.stderr = !VERBOSE) # 64 MB default cache size
+		Sys.sleep(0.5)
+	}
+	Sys.sleep(2)
 }
-Sys.sleep(2)
+
+
+stop_servers <- function() {
+	for (i in 1:NSERVER) {
+		system(paste("rascontrol -q -x down srv TEST", i , sep=""),ignore.stdout = !VERBOSE, ignore.stderr = !VERBOSE)
+		Sys.sleep(0.5)
+		system(paste("rascontrol -q -x remove srv TEST", i , sep=""),ignore.stdout = !VERBOSE, ignore.stderr = !VERBOSE)
+	}
+	Sys.sleep(2)
+}
+
+restart_servers <- function() {
+	stop_servers()
+	start_servers()
+}
+
+
 cat("DONE.\n")
 #system("rascontrol -q -x list srv -all")
 
 
-for (i in 1:NSERVER) {
-	system(paste("rascontrol -q -x up srv TEST", i , sep=""),ignore.stdout = !VERBOSE, ignore.stderr = !VERBOSE) 
-	Sys.sleep(0.5)
-}
+start_servers()
 
 
 
@@ -65,7 +82,7 @@ for (i in 1:NQUERYMAX) {
 	for (z in 1:ITERATIONS) {
 		#ct <- ct + system.time(system(paste("parallel rasql --user rasadmin --passwd rasadmin -q 'select (marray variance in [1:", NM, ",1:", NM, "] values condense + over y in [1:", NT ,"] using (TestColl[variance[0], variance[1], y[0]] - avg_cells(TestColl[variance[0], variance[1], 1:", NT, "])) * (TestColl[variance[0], variance[1], y[0]] - avg_cells(TestColl[variance[0], variance[1], 1:", NT, "])) / ", NT-1 ,"f)[1,1] from TestColl' --out string ::: {1..", NQUERIES, "}", sep=""),ignore.stdout = !VERBOSE, ignore.stderr = !VERBOSE))[3]
 		ct <- ct + system.time(system(paste("./run_v2.sh", NM, nt, i),ignore.stdout = !VERBOSE, ignore.stderr = !VERBOSE))[3]
-		Sys.sleep(0.5)
+		restart_servers() # Otherwise, memory consumption of single rasserver process may become problematic
 		cat(".")
 	}
 	cat(" TOOK ", round(ct / ITERATIONS, digits=2), "s\n")
@@ -88,12 +105,7 @@ cat("Cleaning up...")
 # Clean up
 
 
-for (i in 1:NSERVER) {
-    system(paste("rascontrol -q -x down srv TEST", i , sep=""),ignore.stdout = !VERBOSE, ignore.stderr = !VERBOSE)
-	Sys.sleep(0.5)
-	system(paste("rascontrol -q -x remove srv TEST", i , sep=""),ignore.stdout = !VERBOSE, ignore.stderr = !VERBOSE)
-}
-
+stop_servers()
 
 # Start default servers
 system("rascontrol -q -x up srv N1",ignore.stdout = !VERBOSE, ignore.stderr = !VERBOSE)

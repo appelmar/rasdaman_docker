@@ -19,12 +19,17 @@ query() {
 		sleep 5
 	 fi
 	done  
+	if ((i >= MAXTRIES))
+	 then
+		echo -e "ERROR: QUERY ${3} RETURNED NON-ZERO EXIT STATUS"
+	 fi
 	echo -e "Query ${3} terminated"
 	exit
 }
 
 for i in `seq 1 $3`; do
    query $1 $2 $i &
+   sleep 0.05
 done
 wait
 echo -e "FINISHED"
