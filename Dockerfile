@@ -104,12 +104,6 @@ RUN make
 RUN make install
 
 
-# Install gnu-parallel
-RUN wget http://git.savannah.gnu.org/cgit/parallel.git/plain/src/parallel
-RUN chmod 755 parallel
-RUN cp parallel sem
-RUN sudo mv parallel sem /usr/bin/ 
-
 
 # Some neccessary rasdaman adjustments
 RUN sed -i 's/=petauser/=rasdaman/g' $RMANHOME/etc/petascope.properties

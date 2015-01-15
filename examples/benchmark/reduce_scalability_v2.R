@@ -36,21 +36,30 @@ Sys.sleep(3)
 
 for (i in 1:NSERVER) {
 	# using tile cache leads to segfault errors -> set to 0 (default)
-	system(paste("rascontrol -q -x define srv TEST", i ," -host rasdaman-dev1 -type n -port ", 8001 + i , " -dbh rasdaman_host", sep=""),ignore.stdout = !VERBOSE, ignore.stderr = !VERBOSE) # 64 MB default cache size
-	system(paste("rascontrol -q -x change srv TEST", i ," -countdown 10000 -autorestart on -xp --timeout 10000", sep=""),ignore.stdout = !VERBOSE, ignore.stderr = !VERBOSE) # 64 MB default cache size
-	system(paste("rascontrol -q -x up srv TEST", i , sep=""),ignore.stdout = !VERBOSE, ignore.stderr = !VERBOSE) # 64 MB default cache size
+	# Beware of already open ports of other services (e.g Tomcat!)
+	system(paste("rascontrol -q -x define srv TEST", i ," -host rasdaman-dev1 -type n -port ", 9001 + i , " -dbh rasdaman_host", sep=""),ignore.stdout = !VERBOSE, ignore.stderr = !VERBOSE) # 64 MB default cache size
+	system(paste("rascontrol -q -x change srv TEST", i ," -countdown 200 -autorestart on", sep=""),ignore.stdout = !VERBOSE, ignore.stderr = !VERBOSE) # 64 MB default cache size
+	Sys.sleep(0.5)
 }
 Sys.sleep(2)
 cat("DONE.\n")
+#system("rascontrol -q -x list srv -all")
+
+
+for (i in 1:NSERVER) {
+	system(paste("rascontrol -q -x up srv TEST", i , sep=""),ignore.stdout = !VERBOSE, ignore.stderr = !VERBOSE) 
+	Sys.sleep(0.5)
+}
 
 
 
-
+	
+	
 cat("STARTING SCALABILITY TEST \n")
 
 result <- data.frame(NT=rep(NA,NQUERYMAX), NM=rep(NM,NQUERYMAX), NSERVER=rep(NSERVER,NQUERYMAX), NQUERIES=1:NQUERYMAX, RUNTIME=rep(NA,NQUERYMAX))
 for (i in 1:NQUERYMAX) {
-	nt < ceil(NT / i)
+	nt <- ceiling(NT / i)
 	ct <- 0
 	cat("USING IMAGE SIZE", NM, "x", NM, "- POINTS IN TIME", nt, "- NQUERIES", i, "- RUNNING SERVERS", NSERVER)
 	for (z in 1:ITERATIONS) {
