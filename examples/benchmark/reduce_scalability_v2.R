@@ -6,6 +6,7 @@ NM = 200 # 500
 NSERVER= 10
 VERBOSE=T
 
+starttime = Sys.time()
 
 #rasql --user rasadmin --passwd rasadmin -q "select (marray x in [1:5,1:5] values 1f)[1,1] from TestColl" --out string 
 
@@ -35,7 +36,10 @@ Sys.sleep(3)
 
 
 
-start_servers <- function() {
+
+
+
+install_servers <- function() {
 	for (i in 1:NSERVER) {
 		# using tile cache leads to segfault errors -> set to 0 (default)
 		# Beware of already open ports of other services (e.g Tomcat!)
@@ -46,12 +50,27 @@ start_servers <- function() {
 	Sys.sleep(2)
 }
 
+remove_servers <- function() {
+	for (i in 1:NSERVER) {
+		system(paste("rascontrol -q -x remove srv TEST", i , sep=""),ignore.stdout = !VERBOSE, ignore.stderr = !VERBOSE)
+		Sys.sleep(0.5)
+	}
+	Sys.sleep(2)
+}
+
+start_servers <- function() {
+	for (i in 1:NSERVER) {
+		system(paste("rascontrol -q -x up srv TEST", i , sep=""),ignore.stdout = !VERBOSE, ignore.stderr = !VERBOSE)
+		Sys.sleep(0.5)
+	}
+	Sys.sleep(2)
+}
+
 
 stop_servers <- function() {
 	for (i in 1:NSERVER) {
 		system(paste("rascontrol -q -x down srv TEST", i , sep=""),ignore.stdout = !VERBOSE, ignore.stderr = !VERBOSE)
 		Sys.sleep(0.5)
-		system(paste("rascontrol -q -x remove srv TEST", i , sep=""),ignore.stdout = !VERBOSE, ignore.stderr = !VERBOSE)
 	}
 	Sys.sleep(2)
 }
@@ -65,7 +84,7 @@ restart_servers <- function() {
 cat("DONE.\n")
 #system("rascontrol -q -x list srv -all")
 
-
+install_servers()
 start_servers()
 
 
@@ -90,7 +109,9 @@ for (i in 1:NQUERYMAX) {
 	result[i,"NT"] = nt
 }
 
-save(result, file="result.rda")
+
+
+save(result, file=paste("result_",as.character(Sys.info()["nodename"]), "_", format(starttime,format="%Y-%m-%d-%H-%M-%S"),".rda" ,sep="")
 
 
 
@@ -106,6 +127,7 @@ cat("Cleaning up...")
 
 
 stop_servers()
+remove_servers()
 
 # Start default servers
 system("rascontrol -q -x up srv N1",ignore.stdout = !VERBOSE, ignore.stderr = !VERBOSE)

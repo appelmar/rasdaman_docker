@@ -47,7 +47,7 @@ echo -e "The following settings will be written to postgresql.conf:"
 echo -e "max_connections = ${MAX_CONNECTIONS}"
 echo -e "shared_buffers = ${SHARED_BUFFERS}"
 echo -e "work_mem = ${WORK_MEM}"
-echo -e "maintanance_work_mem = ${MAINTANANCE_WORK_MEM}"
+#echo -e "maintanance_work_mem = ${MAINTANANCE_WORK_MEM}"
 echo -e "synchronous_commit = ${SYNCHRONOUS_COMMIT}"
 echo -e "wal_buffers = ${WAL_BUFFERS}"
 echo -e "checkpoint_segments = ${CHECKPOINT_SEGMENTS}"
@@ -55,7 +55,7 @@ echo -e "checkpoint_completion_target = ${CHECKPOINT_COMPLETION_TARGET}"
 echo -e "random_page_cost = ${RANDOM_PAGE_COST}"
 echo -e "effective_cache_size = ${EFFECTIVE_CACHE_SIZE}"
 echo -e "logging_collector = ${LOGGING_COLLECTION}"
-echo -e "log_line_prefix = ${LOG_LINE_PREFIX}"
+#echo -e "log_line_prefix = ${LOG_LINE_PREFIX}"
 
 
 read -p "Are you sure you want to use these postgres settings? Type y or n"  -n 1 -r REPLY
@@ -74,7 +74,7 @@ fi
 # Comment old settings
 sed -i 's!^max_connections!#max_connections!' $POSTGRES_CONFFILE
 sed -i 's!^shared_buffers!#shared_buffers!' $POSTGRES_CONFFILE
-sed -i 's!^maintanance_work_mem!#maintenance_work_mem!' $POSTGRES_CONFFILE
+#sed -i 's!^maintanance_work_mem!#maintenance_work_mem!' $POSTGRES_CONFFILE
 sed -i 's!^work_mem!#work_mem!' $POSTGRES_CONFFILE
 sed -i 's!^synchronous_commit!#synchronous_commit!' $POSTGRES_CONFFILE
 sed -i 's!^wal_buffers!#wal_buffers!' $POSTGRES_CONFFILE
@@ -83,14 +83,14 @@ sed -i 's!^checkpoint_completion_target!#checkpoint_completion_target!' $POSTGRE
 sed -i 's!^random_page_cost!#random_page_cost!' $POSTGRES_CONFFILE
 sed -i 's!^effective_cache_size!#effective_cache_size!' $POSTGRES_CONFFILE
 sed -i 's!^logging_collector!#logging_collector!' $POSTGRES_CONFFILE
-sed -i 's!^log_line_prefix!#log_line_prefix!' $POSTGRES_CONFFILE
+#sed -i 's!^log_line_prefix!#log_line_prefix!' $POSTGRES_CONFFILE
 
 # Append new settings
 echo -e "\n\n###### CUSTOM SETTINGS OPTIMIZED FOR RASDAMAN GIVEN ${TOTAL_RAM} MB RAM AND ${USERS} USERS #######"  >> $POSTGRES_CONFFILE
 echo -e "max_connections = ${MAX_CONNECTIONS}" >> $POSTGRES_CONFFILE
 echo -e "shared_buffers = ${SHARED_BUFFERS}" >> $POSTGRES_CONFFILE
 echo -e "work_mem = ${WORK_MEM}" >> $POSTGRES_CONFFILE
-echo -e "maintanance_work_mem = ${MAINTANANCE_WORK_MEM}" >> $POSTGRES_CONFFILE
+#echo -e "maintanance_work_mem = ${MAINTANANCE_WORK_MEM}" >> $POSTGRES_CONFFILE
 echo -e "synchronous_commit = ${SYNCHRONOUS_COMMIT}"  >> $POSTGRES_CONFFILE
 echo -e "wal_buffers = ${WAL_BUFFERS}" >>  $POSTGRES_CONFFILE
 echo -e "checkpoint_segments = ${CHECKPOINT_SEGMENTS}" >> $POSTGRES_CONFFILE
@@ -98,7 +98,7 @@ echo -e "checkpoint_completion_target = ${CHECKPOINT_COMPLETION_TARGET}" >> $POS
 echo -e "random_page_cost = ${RANDOM_PAGE_COST}" >> $POSTGRES_CONFFILE
 echo -e "effective_cache_size = ${EFFECTIVE_CACHE_SIZE}" >> $POSTGRES_CONFFILE
 echo -e "logging_collector = ${LOGGING_COLLECTION}" >> $POSTGRES_CONFFILE
-echo -e "log_line_prefix = ${LOG_LINE_PREFIX}"  >> $POSTGRES_CONFFILE
+#echo -e "log_line_prefix = ${LOG_LINE_PREFIX}"  >> $POSTGRES_CONFFILE
 echo -e "###################################################################\n\n" >> $POSTGRES_CONFFILE
 
 
