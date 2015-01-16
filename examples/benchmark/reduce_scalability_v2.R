@@ -1,10 +1,22 @@
 
-ITERATIONS = 5 #5
-NQUERYMAX = 10 #10 <= NSERVER
-NT = 100   # 30
-NM = 200 # 500
-NSERVER= 10
+sink("reduce_scalability_v2.log")
+
+ITERATIONS = 3 #5
+NSERVER = 8
+NQUERYMAX = 8 #10 <= NSERVER
+NT = 96   
+NM = 96 
 VERBOSE=T
+
+## Pars for server test:
+# ITERATIONS = 5 #
+# NSERVER = 32
+# NQUERYMAX = 32 
+# NT = 128  
+# NM = 264 
+# VERBOSE=T
+
+
 
 starttime = Sys.time()
 
@@ -92,8 +104,8 @@ start_servers()
 	
 	
 cat("STARTING SCALABILITY TEST \n")
-
-result <- data.frame(NT=rep(NA,NQUERYMAX), NM=rep(NM,NQUERYMAX), NSERVER=rep(NSERVER,NQUERYMAX), NQUERIES=1:NQUERYMAX, RUNTIME=rep(NA,NQUERYMAX))
+# CONSTANT TOTAL WORKLOAD
+result_constanttotalworkload <- data.frame(NT=rep(NA,NQUERYMAX), NM=rep(NM,NQUERYMAX), NSERVER=rep(NSERVER,NQUERYMAX), NQUERIES=1:NQUERYMAX, RUNTIME=rep(NA,NQUERYMAX))
 for (i in 1:NQUERYMAX) {
 	nt <- ceiling(NT / i)
 	ct <- 0
@@ -105,13 +117,29 @@ for (i in 1:NQUERYMAX) {
 		cat(".")
 	}
 	cat(" TOOK ", round(ct / ITERATIONS, digits=2), "s\n")
-	result[i,"RUNTIME"] = ct / ITERATIONS
-	result[i,"NT"] = nt
+	result_constanttotalworkload[i,"RUNTIME"] = ct / ITERATIONS
+	result_constanttotalworkload[i,"NT"] = nt
 }
+save(result_constanttotalworkload, file=paste("result_constanttotalworkload_",as.character(Sys.info()["nodename"]), "_", format(starttime,format="%Y-%m-%d-%H-%M-%S"),".rda" ,sep=""))
 
 
-
-save(result, file=paste("result_",as.character(Sys.info()["nodename"]), "_", format(starttime,format="%Y-%m-%d-%H-%M-%S"),".rda" ,sep="")
+# # CONSTANT WORKLOAD PER QUERY
+# result_constantqueryworkload <- data.frame(NT=rep(NA,NQUERYMAX), NM=rep(NM,NQUERYMAX), NSERVER=rep(NSERVER,NQUERYMAX), NQUERIES=1:NQUERYMAX, RUNTIME=rep(NA,NQUERYMAX))
+# for (i in 1:NQUERYMAX) {
+	# nt <- NT
+	# ct <- 0
+	# cat("USING IMAGE SIZE", NM, "x", NM, "- POINTS IN TIME", nt, "- NQUERIES", i, "- RUNNING SERVERS", NSERVER)
+	# for (z in 1:ITERATIONS) {
+		# #ct <- ct + system.time(system(paste("parallel rasql --user rasadmin --passwd rasadmin -q 'select (marray variance in [1:", NM, ",1:", NM, "] values condense + over y in [1:", NT ,"] using (TestColl[variance[0], variance[1], y[0]] - avg_cells(TestColl[variance[0], variance[1], 1:", NT, "])) * (TestColl[variance[0], variance[1], y[0]] - avg_cells(TestColl[variance[0], variance[1], 1:", NT, "])) / ", NT-1 ,"f)[1,1] from TestColl' --out string ::: {1..", NQUERIES, "}", sep=""),ignore.stdout = !VERBOSE, ignore.stderr = !VERBOSE))[3]
+		# ct <- ct + system.time(system(paste("./run_v2.sh", NM, nt, i),ignore.stdout = !VERBOSE, ignore.stderr = !VERBOSE))[3]
+		# restart_servers() # Otherwise, memory consumption of single rasserver process may become problematic
+		# cat(".")
+	# }
+	# cat(" TOOK ", round(ct / ITERATIONS, digits=2), "s\n")
+	# result_constantqueryworkload[i,"RUNTIME"] = ct / ITERATIONS
+	# result_constantqueryworkload[i,"NT"] = nt
+# }
+# save(result_constantqueryworkload, file=paste("result_constantqueryworkload_",as.character(Sys.info()["nodename"]), "_", format(starttime,format="%Y-%m-%d-%H-%M-%S"),".rda" ,sep=""))
 
 
 

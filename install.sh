@@ -9,7 +9,7 @@
 export IMAGE_TAG=rasdaman-img
 export CONTAINER_TAG=rasdaman-dev1
 
-echo -e "Installation script for creating a Docker image and container running Rasdaman started.Building the image requires downloading lots of package dependencies and thus might take up to 30 minutes.\n"
+echo -e "Installation script for creating a Docker image and container running Rasdaman started. Building the image requires downloading lots of package dependencies and thus might take up to 30 minutes.\n"
 read -p "Are you sure you want to continue now? Type y or n: " -n 1 -r REPLY
 echo    # (optional) move to a new line
 if [[ ! $REPLY =~ ^[Yy]$ ]]
@@ -20,7 +20,7 @@ fi
 docker stop $CONTAINER_TAG
 docker rm $CONTAINER_TAG
 #docker rmi $IMAGE_TAG
-docker build --rm=false --tag="$IMAGE_TAG" . && echo "Docker image $IMAGE_TAG build successfully!"
+docker build --rm=true --tag="$IMAGE_TAG" . && echo "Docker image $IMAGE_TAG build successfully!"
 rm -R -f ~/docker.${CONTAINER_TAG}
 mkdir ~/docker.${CONTAINER_TAG}
 
