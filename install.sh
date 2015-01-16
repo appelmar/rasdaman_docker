@@ -27,6 +27,9 @@ mkdir ~/docker.${CONTAINER_TAG}
 echo -e "Container $CONTAINER_TAG will be started for the first time now..."
 docker run -d --name="$CONTAINER_TAG" -h $CONTAINER_TAG -p 21210:22 -p 21211:8080 -p 21212:7001 -p 21213:5432 -v ~/docker.${CONTAINER_TAG}:/opt/shared $IMAGE_TAG 
 
+# Example with limited CPUs: 
+# docker run -d --name="$CONTAINER_TAG" -h $CONTAINER_TAG --cpuset=$(seq -s, 0 1 2) -p 21210:22 -p 21211:8080 -p 21212:7001 -p 21213:5432 -v ~/docker.${CONTAINER_TAG}:/opt/shared $IMAGE_TAG 
+
 
 echo -e "DONE. You can now login to the container via ssh."
 #sleep 60
