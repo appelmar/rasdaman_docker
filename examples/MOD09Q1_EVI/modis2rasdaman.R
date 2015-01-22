@@ -5,7 +5,7 @@ VERBOSE = T
 H = 12
 V = 9
 STARTDATE = "2006.06.01"
-ENDDATE = "2006.06.30"
+ENDDATE = "2006.06.10"
 IMAGESIZE = c(4800,4800)
 RASDAMAN_ARRAYNAME = "MOD09Q1"
 RASDAMAN_ARRAYDIMS = IMAGESIZE * c(max(H)-min(H)+1,max(V)-min(V)+1)
@@ -87,9 +87,9 @@ system(cmd,ignore.stdout = !VERBOSE,ignore.stderr = !VERBOSE)
 
 
 
+filenames = basename(hdffiles$MOD09Q1.005) 
 
 # Process HDF files before loading into rasdaman
-filenames = basename(hdffiles$MOD09Q1.005) 
 for (i in 1:length(hdffiles$MOD09Q1.005)) {
   
   # Extract tile IDs, year and day of year out of MODIS filename
@@ -102,9 +102,22 @@ for (i in 1:length(hdffiles$MOD09Q1.005)) {
   
   ## GDAL AND GDAL MERGE REQUIRED! BINARIES MUST BE IN PATH
   
-  for (k in 1:length(HDF_SUBDATASETS)) {
-    system(paste('gdal_translate -of GTiff HDF4_EOS:EOS_GRID:\"', hdffiles$MOD09Q1.005[i] , '\":', HDF_SUBDATASETS[k] , ' temp_', k, '.tif' ,  sep=""),ignore.stdout = !VERBOSE,ignore.stderr = !VERBOSE)  
-  }
+  # TODO: Paralellization, unique filenames,temporary file deletion
+  #-ot {Byte/Int16/UInt16/UInt32/Int32/Float32
+  
+       
+  system(paste('gdal_translate -of GTiff -ot Int16 HDF4_EOS:EOS_GRID:\"', hdffiles$MOD09Q1.005[i] , '\":', HDF_SUBDATASETS[1] , ' temp_', 1, '.tif' ,  sep=""),ignore.stdout = !VERBOSE,ignore.stderr = !VERBOSE)  
+  system(paste('gdal_translate -of GTiff -ot Int16 HDF4_EOS:EOS_GRID:\"', hdffiles$MOD09Q1.005[i] , '\":', HDF_SUBDATASETS[2] , ' temp_', 2, '.tif' ,  sep=""),ignore.stdout = !VERBOSE,ignore.stderr = !VERBOSE)  
+  system(paste('gdal_translate -of GTiff -ot UInt16 HDF4_EOS:EOS_GRID:\"', hdffiles$MOD09Q1.005[i] , '\":', HDF_SUBDATASETS[3] , ' temp_', 3, '.tif' ,  sep=""),ignore.stdout = !VERBOSE,ignore.stderr = !VERBOSE)  
+  
+       
+       
+#   for (k in 1:length(HDF_SUBDATASETS)) {
+#     system(paste('gdal_translate -of GTiff HDF4_EOS:EOS_GRID:\"', hdffiles$MOD09Q1.005[i] , '\":', HDF_SUBDATASETS[k] , ' temp_', k, '.tif' ,  sep=""),ignore.stdout = !VERBOSE,ignore.stderr = !VERBOSE)  
+#   }
+  
+  
+  
   
   cmd = paste('gdal_merge.py -separate ', paste0("temp_", 1:length(HDF_SUBDATASETS), ".tif", collapse=" "), ' -o temp.tif', sep="")
   system(cmd,ignore.stdout = !VERBOSE,ignore.stderr = !VERBOSE)
@@ -118,8 +131,11 @@ for (i in 1:length(hdffiles$MOD09Q1.005)) {
   
   targetdims = paste(0+shift[1], ":" , IMAGESIZE[1]+shift[1]-1 , ",", 0+shift[2], ":" , IMAGESIZE[1]+shift[2]-1 , ",",  shift[3] ,sep="")
   #rasql --user rasadmin --passwd rasadmin -q  'update TRMM as c set c[*:*,*:*,i] assign inv_tiff($1)' --file temp.tif 
-  cmd = paste("rasql --user rasadmin --passwd rasadmin -q 'update ", RASDAMAN_ARRAYNAME, " as c set c[" , targetdims, "] assign inv_tiff($1)' --file temp.tif", sep="")
-  system(cmd,ignore.stdout = !VERBOSE,ignore.stderr = !VERBOSE)
+  cmd = paste("rasql --user rasadmin --passwd rasadmin -q 'update ", RASDAMAN_ARRAYNAME, " as c set c[" , targetdims, "] assign inv_tiff($1,\"sampletype=short\")' --file temp.tif", sep="")
+  
+cmd = paste("rasql --user rasadmin --passwd rasadmin -q 'update ", RASDAMAN_ARRAYNAME, " as c set c[" , targetdims, "] assign inv_tiff($1,\'sampletype=short\')' --file temp.tif", sep="")
+
+system(cmd,ignore.stdout = !VERBOSE,ignore.stderr = !VERBOSE)
   
 
   

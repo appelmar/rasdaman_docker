@@ -1,5 +1,5 @@
 
-struct MOD09Q1_pixel {short red; short nir; unsigned short quality;}; // Pixel type of MOD09Q1 images
+struct MOD09Q1_pixel {short red; short nir; short quality;}; // Pixel type of MOD09Q1 images
 typedef marray <MOD09Q1_pixel , 2>   MOD09Q1_image; // Two-dimensional (fixed time) MOD09Q1 array without bounds
 typedef marray <MOD09Q1_pixel , 3>   MOD09Q1_stack; // Three-dimensional spatiotemporal MOD09Q1 stack
 typedef set <MOD09Q1_image> MOD09Q1_image_set;
