@@ -21,6 +21,13 @@ HDF_SUBDATASETS = c("MOD_Grid_250m_Surface_Reflectance:sur_refl_b01",
 
 
 
+				
+# Set default CRAN mirror
+local({
+  r <- getOption("repos")
+  r["CRAN"] <- "http://cran.rstudio.com/"
+  options(repos = r)
+})
 
 # LOAD AND (IF NEEDED) INSTALL REQUIRED PACKAGES
 if (!require(sp)) {
@@ -49,8 +56,16 @@ if (!require(rgeos)) {
   library(rgeos)
 }
 
+if (!require(RCurl)) {
+  install.packages("RCurl")
+  library(RCurl)
+}
 
 
+if (!require(XML)) {
+  install.packages("XML")
+  library(XML)
+}
 
 
 
@@ -67,27 +82,8 @@ hdffiles = getHdf("MOD09Q1",begin=STARTDATE, end=ENDDATE, tileH=H, tileV=V )
 
 
 # Create Rasdaman Array
-cmd = paste("./createArray", RASDAMAN_ARRAYNAME,RASDAMAN_CHUNKSIZE[1],RASDAMAN_CHUNKSIZE[2],RASDAMAN_CHUNKSIZE[3])
+cmd = paste("./createArray.sh", RASDAMAN_ARRAYNAME,RASDAMAN_CHUNKSIZE[1],RASDAMAN_CHUNKSIZE[2],RASDAMAN_CHUNKSIZE[3])
 system(cmd,ignore.stdout = !VERBOSE,ignore.stderr = !VERBOSE)
-
-
-
-# MOD09Q1 array type definitions
-system('rasdl --delmsettype "MOD09Q1_stack_set"'
-rasdl --delmsettype "MOD09Q1_image_set"
-rasdl --delmddtype "MOD09Q1_stack"
-rasdl --delmddtype "MOD09Q1_image"
-rasdl --delbasetype "MOD09Q1_pixel"
-rasdl -r /home/rasdaman/examples/MOD09Q1_EVI/MOD09Q1.dl -i # Add data types for MOD09Q1 data
-
-
-
-# Create collection for 3 bands
-rasql --user rasadmin --passwd rasadmin -q "drop collection MOD09Q1" # delete if exists
-rasql --user rasadmin --passwd rasadmin -q "create collection MOD09Q1 MOD09Q1_image_set" 
-rasql --user rasadmin --passwd rasadmin -q "insert into MOD09Q1 values marray it in [0:0,0:0] values struct {0s,0s,0us} tiling regular [0:511,0:511] index rpt_index" 
-
-
 
 
 
@@ -107,10 +103,10 @@ for (i in 1:length(hdffiles$MOD09Q1.005)) {
   ## GDAL AND GDAL MERGE REQUIRED! BINARIES MUST BE IN PATH
   
   for (k in 1:length(HDF_SUBDATASETS)) {
-    system(paste('gdal_translate -of GTiff HDF4_EOS:EOS_GRID:"', filenames[i] , '":', HDF_SUBDATASETS[k] , ' temp_', k, '.tif' ,  sep=""),ignore.stdout = !VERBOSE,ignore.stderr = !VERBOSE)  
+    system(paste('gdal_translate -of GTiff HDF4_EOS:EOS_GRID:\"', hdffiles$MOD09Q1.005[i] , '\":', HDF_SUBDATASETS[k] , ' temp_', k, '.tif' ,  sep=""),ignore.stdout = !VERBOSE,ignore.stderr = !VERBOSE)  
   }
   
-  cmd = paste('gdal_merge.py -separate ', cat(paste0("temp_", 1:length(HDF_SUBDATASETS), ".tif")), ' -o temp.tif', sep="")
+  cmd = paste('gdal_merge.py -separate ', paste0("temp_", 1:length(HDF_SUBDATASETS), ".tif", collapse=" "), ' -o temp.tif', sep="")
   system(cmd,ignore.stdout = !VERBOSE,ignore.stderr = !VERBOSE)
   
   
@@ -118,11 +114,11 @@ for (i in 1:length(hdffiles$MOD09Q1.005)) {
   # Load to Rasdaman
   
   # automatically compute shift parameter
-  shift = c((htile-min(H))*IMAGESIZE[1],(vtile-min(V))*IMAGESIZE[2], i) # WARNING: Assumes that files wil be process in temporal order
+  shift = c((htile-min(H))*IMAGESIZE[1],(vtile-min(V))*IMAGESIZE[2], i) # WARNING: Assumes that files will be process in temporal order
   
   targetdims = paste(0+shift[1], ":" , IMAGESIZE[1]+shift[1]-1 , ",", 0+shift[2], ":" , IMAGESIZE[1]+shift[2]-1 , ",",  shift[3] ,sep="")
   #rasql --user rasadmin --passwd rasadmin -q  'update TRMM as c set c[*:*,*:*,i] assign inv_tiff($1)' --file temp.tif 
-  cmd = paste("rasql -q 'update ", RASDAMAN_ARRAYNAME, "  as c set c[" , targetdims, "] assign inv_tiff($1)' --file temp.tif", sep="")
+  cmd = paste("rasql --user rasadmin --passwd rasadmin -q 'update ", RASDAMAN_ARRAYNAME, " as c set c[" , targetdims, "] assign inv_tiff($1)' --file temp.tif", sep="")
   system(cmd,ignore.stdout = !VERBOSE,ignore.stderr = !VERBOSE)
   
 

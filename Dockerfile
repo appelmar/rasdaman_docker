@@ -63,11 +63,15 @@ RUN apt-get -qq update && apt-get install --fix-missing -y --force-yes \
 	libsigsegv-dev \
 	vim \
 	supervisor \
-	r-base \
 	libproj-dev
 
+# Install latest R version
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E084DAB9
+RUN echo "deb http://cran.rstudio.com/bin/linux/ubuntu precise/" >> /etc/apt/sources.list
+RUN apt-get update && apt-get install --fix-missing -y --force-yes r-base
 
 
+# Install Tomcat6
 RUN wget -t 3 -w 2 ftp://ftp.fu-berlin.de/unix/www/apache/tomcat/tomcat-6/v6.0.43/bin/apache-tomcat-6.0.43.tar.gz
 RUN tar -xzf apache-tomcat-6.0.43.tar.gz
 RUN mv apache-tomcat-6.0.43 /opt/tomcat6
