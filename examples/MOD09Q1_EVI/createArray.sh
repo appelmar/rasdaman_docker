@@ -19,7 +19,7 @@ rasdl -r MOD09Q1.dl -i # Add data types for MOD09Q1 data
 
 rasql --user rasadmin --passwd rasadmin -q "drop collection ${1}" # delete if exists
 rasql --user rasadmin --passwd rasadmin -q "create collection ${1} MOD09Q1_stack_set" 
-rasql --user rasadmin --passwd rasadmin -q "insert into ${1} values marray it in [1:1,1:1,1:1] values struct {0s,0s,0s} tiling regular [1:${2},1:${3},1:${4}]" 
+rasql --user rasadmin --passwd rasadmin -q "insert into ${1} values marray it in [0:0,0:0,0:0] values struct {0s,0s,0s} tiling regular [0:${2},0:${3},0:${4}]" 
  
 # Check whether array exists
 #rasql --user rasadmin --passwd rasadmin -q "select r from RAS_COLLECTIONNAMES as r" --out string

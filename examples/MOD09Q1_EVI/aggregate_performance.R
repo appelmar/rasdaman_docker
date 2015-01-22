@@ -1,5 +1,5 @@
 
-sink("apply_performance.log")
+sink("aggregate_performance.log")
 
 RASDAMAN_ARRAYNAME = "MOD09Q1"
 
@@ -103,7 +103,7 @@ for (i in 1:length(NM)]) {
 	cat("USING IMAGE SIZE", NM[i], "x", NM, "- POINTS IN TIME", NM, "-", NSERVER , "RUNNING SERVERS ")
 	for (z in 1:ITERATIONS) {
 		targetdims = paste(0, ":" , NM[i] , ",", 0, ":" , NM[i] , ",",  NT ,sep="")
-		cmd = paste("rasql -q 'select (2.5f * (img[", targetdims ,"].nir - img[", targetdims ,"].red) / (1f+2.4f*img[", targetdims ,"].red +img[", targetdims ,"].nir)) from ", RASDAMAN_ARRAYNAME ," as img' --out none" , sep="" )
+		cmd = paste("rasql -q 'select max_cells(2.5f * (img[", targetdims ,"].nir - img[", targetdims ,"].red) / (1f+2.4f*img[", targetdims ,"].red +img[", targetdims ,"].nir)) from ", RASDAMAN_ARRAYNAME ," as img' --out none" , sep="" )
 		ct <- ct + system.time(system(cmd,ignore.stdout = !VERBOSE, ignore.stderr = !VERBOSE))[3]
 		##
 		#cmd = paste("rasql -q 'select encode((2.5f * (img[", targetdims ,"].nir - img[", targetdims ,"].red) / (1f+2.4f*img[", targetdims ,"].red +img[", targetdims ,"].nir)),\"netCDF\") from ", RASDAMAN_ARRAYNAME ," as img' --out file --outfile MOD09Q1_ENVI " , sep="" )

@@ -82,7 +82,7 @@ hdffiles = getHdf("MOD09Q1",begin=STARTDATE, end=ENDDATE, tileH=H, tileV=V )
 
 
 # Create Rasdaman Array
-cmd = paste("./createArray.sh", RASDAMAN_ARRAYNAME,RASDAMAN_CHUNKSIZE[1],RASDAMAN_CHUNKSIZE[2],RASDAMAN_CHUNKSIZE[3])
+cmd = paste("./createArray.sh", RASDAMAN_ARRAYNAME,RASDAMAN_CHUNKSIZE[1]-1,RASDAMAN_CHUNKSIZE[2]-1,RASDAMAN_CHUNKSIZE[3]-1)
 system(cmd,ignore.stdout = !VERBOSE,ignore.stderr = !VERBOSE)
 
 
@@ -133,9 +133,7 @@ for (i in 1:length(hdffiles$MOD09Q1.005)) {
   #rasql --user rasadmin --passwd rasadmin -q  'update TRMM as c set c[*:*,*:*,i] assign inv_tiff($1)' --file temp.tif 
   cmd = paste("rasql --user rasadmin --passwd rasadmin -q 'update ", RASDAMAN_ARRAYNAME, " as c set c[" , targetdims, "] assign inv_tiff($1,\"sampletype=short\")' --file temp.tif", sep="")
   
-cmd = paste("rasql --user rasadmin --passwd rasadmin -q 'update ", RASDAMAN_ARRAYNAME, " as c set c[" , targetdims, "] assign inv_tiff($1,\'sampletype=short\')' --file temp.tif", sep="")
-
-system(cmd,ignore.stdout = !VERBOSE,ignore.stderr = !VERBOSE)
+  system(cmd,ignore.stdout = !VERBOSE,ignore.stderr = !VERBOSE)
   
 
   
