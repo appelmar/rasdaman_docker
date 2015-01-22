@@ -74,11 +74,13 @@ if (!require(XML)) {
 
 
 
+cat("START DOWNLOADING MODIS IMAGES")
 
 
 # DOWNLOAD MODIS FILES, this might take some time...
 hdffiles = getHdf("MOD09Q1",begin=STARTDATE, end=ENDDATE, tileH=H, tileV=V )
 
+cat("DONE. ", length(hdffiles), " images downloaded.\n")
 
 
 # Create Rasdaman Array
@@ -88,6 +90,9 @@ system(cmd,ignore.stdout = !VERBOSE,ignore.stderr = !VERBOSE)
 
 
 filenames = basename(hdffiles$MOD09Q1.005) 
+
+cat("LOADING FILES INTO RASDAMAN \n")
+
 
 # Process HDF files before loading into rasdaman
 for (i in 1:length(hdffiles$MOD09Q1.005)) {
@@ -135,7 +140,8 @@ for (i in 1:length(hdffiles$MOD09Q1.005)) {
   
   system(cmd,ignore.stdout = !VERBOSE,ignore.stderr = !VERBOSE)
   
-
+  cat(".")
   
 }
 
+cat("FINISHED.")

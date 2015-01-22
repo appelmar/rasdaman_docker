@@ -23,5 +23,5 @@ rasql --user rasadmin --passwd rasadmin -q "insert into ${1} values marray it in
  
 # Check whether array exists
 #rasql --user rasadmin --passwd rasadmin -q "select r from RAS_COLLECTIONNAMES as r" --out string
-#rasql --user rasadmin --passwd rasadmin -q "select sdom(s) from ${1} as s" --out string
+#rasql --user rasadmin --passwd rasadmin -q "select sdom(s) from MOD09Q1 as s" --out string
 #rasql --user rasadmin --passwd rasadmin -q "select dbinfo(c, \"printtiles=1\") from MOD09Q1 as c" --out string

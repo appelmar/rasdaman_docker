@@ -9,6 +9,7 @@ ENV WEBAPPS_HOME $CATALINA_HOME/webapps
 ENV RMANHOME /opt/rasdaman/
 ENV HOSTNAME rasdaman-dev1
 ENV JAVA_HOME /usr/lib/jvm/java-6-openjdk
+ENV R_LIBS /home/rasdaman/R
 
 RUN locale-gen en_US.UTF-8
 ENV LANG en_US.UTF-8
@@ -155,7 +156,7 @@ RUN chmod 0777 /home/rasdaman/pgconfig.sh
 COPY examples /home/rasdaman/examples
 RUN find /home/rasdaman/examples -type d -exec chmod 0777 {} + && find /home/rasdaman/examples -type f -name "*.sh" -exec chmod 0777 {} + # Make all example scripts executable
 
-
+RUN mkdir $R_LIBS
 
 RUN chown -R rasdaman $RMANHOME
 RUN chown -R rasdaman /home/rasdaman

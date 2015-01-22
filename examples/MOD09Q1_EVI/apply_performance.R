@@ -97,25 +97,25 @@ start_servers()
 	
 cat("STARTING RASDAMAN PERFORMANCE TEST FOR EVI APPLY OPERATION \n")
 # CONSTANT TOTAL WORKLOAD
-result <- data.frame(NT=rep(NT,length(NM)), NSERVER=rep(NSERVER,length(NM)), NM=NM, RUNTIME=rep(NA,length(NM)))
-for (i in 1:length(NM)]) {
+result_apply <- data.frame(NT=rep(NT,length(NM)), NSERVER=rep(NSERVER,length(NM)), NM=NM, RUNTIME=rep(NA,length(NM)))
+for (i in 1:length(NM)) {
 	ct <- 0
-	cat("USING IMAGE SIZE", NM[i], "x", NM, "- POINTS IN TIME", NM, "-", NSERVER , "RUNNING SERVERS ")
+	cat("USING IMAGE SIZE", NM[i], "x", NM[i], "- POINTS IN TIME", NT, "-", NSERVER , "RUNNING SERVERS ")
 	for (z in 1:ITERATIONS) {
 		targetdims = paste(0, ":" , NM[i] , ",", 0, ":" , NM[i] , ",",  NT ,sep="")
 		cmd = paste("rasql -q 'select (2.5f * (img[", targetdims ,"].nir - img[", targetdims ,"].red) / (1f+2.4f*img[", targetdims ,"].red +img[", targetdims ,"].nir)) from ", RASDAMAN_ARRAYNAME ," as img' --out none" , sep="" )
 		ct <- ct + system.time(system(cmd,ignore.stdout = !VERBOSE, ignore.stderr = !VERBOSE))[3]
 		##
-		#cmd = paste("rasql -q 'select encode((2.5f * (img[", targetdims ,"].nir - img[", targetdims ,"].red) / (1f+2.4f*img[", targetdims ,"].red +img[", targetdims ,"].nir)),\"netCDF\") from ", RASDAMAN_ARRAYNAME ," as img' --out file --outfile MOD09Q1_ENVI " , sep="" )
+		#cmd = paste("rasql -q 'select encode((2.5f * (img[", targetdims ,"].nir - img[", targetdims ,"].red) / (1f+2.4f*img[", targetdims ,"].red +img[", targetdims ,"].nir)),\"netCDF\") from ", RASDAMAN_ARRAYNAME ," as img' --out file --outfile MOD09Q1_EVI " , sep="" )
 		#system(cmd,ignore.stdout = !VERBOSE, ignore.stderr = !VERBOSE)
 		##
 		cat(".")
 	}
 	cat(" TOOK ", round(ct / ITERATIONS, digits=2), "s\n")
-	result[i,"RUNTIME"] = ct / ITERATIONS
+	result_apply[i,"RUNTIME"] = ct / ITERATIONS
 	restart_servers() # Otherwise, memory consumption of single rasserver process may become problematic
 }
-save(result, file=paste("result_",as.character(Sys.info()["nodename"]), "_", format(starttime,format="%Y-%m-%d-%H-%M-%S"),".rda" ,sep=""))
+save(result_apply, file=paste("result_apply_",as.character(Sys.info()["nodename"]), "_", format(starttime,format="%Y-%m-%d-%H-%M-%S"),".rda" ,sep=""))
 
 
 
