@@ -63,7 +63,8 @@ RUN apt-get -qq update && apt-get install --fix-missing -y --force-yes \
 	libsigsegv-dev \
 	vim \
 	supervisor \
-	r-base 
+	r-base \
+	libproj-dev
 
 
 
