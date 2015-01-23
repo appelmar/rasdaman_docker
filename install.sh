@@ -25,7 +25,7 @@ rm -R -f ~/docker.${CONTAINER_TAG}
 mkdir ~/docker.${CONTAINER_TAG}
 
 echo -e "Container $CONTAINER_TAG will be started for the first time now..."
-docker run -d --name="$CONTAINER_TAG" -h $CONTAINER_TAG -p 21210:22 -p 21211:8080 -p 21212:7001 -p 21213:5432 -v ~/docker.${CONTAINER_TAG}:/opt/shared $IMAGE_TAG 
+docker run -d --name="$CONTAINER_TAG" -h $CONTAINER_TAG -p 21210:22 -p 21211:8080  -v ~/docker.${CONTAINER_TAG}:/opt/shared -v ~/rasdamanSciDB/modisdata:/opt/modisdata $IMAGE_TAG 
 
 # Example with limited CPUs AND limited main memory: 
 # docker run -d --name="$CONTAINER_TAG" -h $CONTAINER_TAG --cpuset=$(seq -s, 1 2 64) -m="1g" -p 21210:22 -v ~/docker.${CONTAINER_TAG}:/opt/shared $IMAGE_TAG 

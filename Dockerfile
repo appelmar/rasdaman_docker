@@ -64,12 +64,11 @@ RUN apt-get -qq update && apt-get install --fix-missing -y --force-yes \
 	libsigsegv-dev \
 	vim \
 	supervisor \
-	libproj-dev \ # Not required if R package MODIS is not used
+	libproj-dev \ 
 	nano
 
 # Install latest R version  # Not required if R package MODIS is not used, older version via apt is sufficient then
-RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E084DAB9
-RUN echo "deb http://cran.rstudio.com/bin/linux/ubuntu precise/" >> /etc/apt/sources.list
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E084DAB9 && echo "deb http://cran.rstudio.com/bin/linux/ubuntu precise/" >> /etc/apt/sources.list
 RUN apt-get update && apt-get install --fix-missing -y --force-yes r-base
 
 
@@ -161,8 +160,8 @@ RUN mkdir $R_LIBS
 
 RUN chown -R rasdaman $RMANHOME
 RUN chown -R rasdaman /home/rasdaman
-RUN mkdir /opt/shared # TODO: Add environment variable for shared folder
-RUN chmod -R 0777 /opt/shared # Allow all users writing to shared folder # This does not work yet, maybe rights for volumes are reset during docker run?
+RUN mkdir /opt/shared /opt/modisdata # TODO: Add environment variable for shared folder
+RUN chmod -R 0777 /opt/shared /opt/modisdata # Allow all users writing to shared folder # This does not work yet, maybe rights for volumes are reset during docker run?
 
 EXPOSE 7001 8080 22 5432
 
