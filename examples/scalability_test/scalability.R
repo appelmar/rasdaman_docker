@@ -143,9 +143,21 @@ save(result, file=paste("result_",as.character(Sys.info()["nodename"]), "_", for
 
 
 
+stop_servers()
+remove_servers()
+# RESTORE DEFAULT CONF
 
-# RESTORE DEFAULT CONF (Only 1 instance)
-system(paste("./home/scidb/scalability_test/updateConfig.sh",0),ignore.stdout = !VERBOSE, ignore.stderr = !VERBOSE)
+
+# Start default servers
+system("rascontrol -q -x up srv N1",ignore.stdout = !VERBOSE, ignore.stderr = !VERBOSE)
+system("rascontrol -q -x up srv N2",ignore.stdout = !VERBOSE, ignore.stderr = !VERBOSE)
+system("rascontrol -q -x up srv N3",ignore.stdout = !VERBOSE, ignore.stderr = !VERBOSE)
+system("rascontrol -q -x up srv N4",ignore.stdout = !VERBOSE, ignore.stderr = !VERBOSE)
+system("rascontrol -q -x up srv N5",ignore.stdout = !VERBOSE, ignore.stderr = !VERBOSE)
+system("rascontrol -q -x up srv N6",ignore.stdout = !VERBOSE, ignore.stderr = !VERBOSE)
+system("rascontrol -q -x up srv N7",ignore.stdout = !VERBOSE, ignore.stderr = !VERBOSE)
+system("rascontrol -q -x up srv N8",ignore.stdout = !VERBOSE, ignore.stderr = !VERBOSE)
+system("rascontrol -q -x up srv N9",ignore.stdout = !VERBOSE, ignore.stderr = !VERBOSE)
 
 
 
