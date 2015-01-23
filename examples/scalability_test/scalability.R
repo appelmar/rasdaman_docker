@@ -1,6 +1,7 @@
 
-sink("reduce_scalability.log")
+sink("scalability.log")
 
+VERBOSE=T
 ITERATIONS = 3
 NINSTANCEMAX = 6
 
@@ -132,7 +133,7 @@ for (i in 1:NINSTANCEMAX) {
 		Sys.sleep(0.5)
 		cat(".")
 	}
-	cat(" TOOK ", round(ct / ITERATIONS, digits=2), "s\n")
+	cat(" TOOK ", round(ct_aggreg2d / ITERATIONS, digits=2), "s - ", round(ct_aggreg3d / ITERATIONS, digits=2), "s - ", round(ct_apply / ITERATIONS, digits=2), "s\n")
 	result[i,"RUNTIME_AGGREG2D"] = ct_aggreg2d / ITERATIONS
 	result[i,"RUNTIME_AGGREG3D"] = ct_aggreg3d / ITERATIONS
 	result[i,"RUNTIME_APPLY"] = ct_apply / ITERATIONS
@@ -144,7 +145,7 @@ save(result, file=paste("result_",as.character(Sys.info()["nodename"]), "_", for
 
 
 # RESTORE DEFAULT CONF (Only 1 instance)
-system(paste("./home/scidb/scalability_test/updateConfig.sh",0,ignore.stdout = !VERBOSE, ignore.stderr = !VERBOSE)
+system(paste("./home/scidb/scalability_test/updateConfig.sh",0),ignore.stdout = !VERBOSE, ignore.stderr = !VERBOSE)
 
 
 
