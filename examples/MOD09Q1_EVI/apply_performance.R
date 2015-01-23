@@ -3,10 +3,10 @@ sink("apply_performance.log")
 
 RASDAMAN_ARRAYNAME = "MOD09Q1"
 
-ITERATIONS = 1 #5
+ITERATIONS = 3 #5
 NSERVER = 12
-NT = 1  
-NM = c(100,1000,4800)
+NT = 4  
+NM = c(100,500,1000,2000,3000,4000,4800)
 VERBOSE=T
 
 ## Pars for server test:
