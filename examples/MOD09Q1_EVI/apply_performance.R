@@ -102,7 +102,7 @@ for (i in 1:length(NM)) {
 	ct <- 0
 	cat("USING IMAGE SIZE", NM[i], "x", NM[i], "- POINTS IN TIME", NT, "-", NSERVER , "RUNNING SERVERS ")
 	for (z in 1:ITERATIONS) {
-		targetdims = paste(0, ":" , NM[i] , ",", 0, ":" , NM[i] , ",",  NT ,sep="")
+		targetdims = paste(0, ":" , NM[i]-1 , ",", 0, ":" , NM[i]-1 , ",0:",  NT-1 ,sep="")
 		cmd = paste("rasql -q 'select (2.5f * (img[", targetdims ,"].nir - img[", targetdims ,"].red) / (1f+2.4f*img[", targetdims ,"].red +img[", targetdims ,"].nir)) from ", RASDAMAN_ARRAYNAME ," as img' --out none" , sep="" )
 		ct <- ct + system.time(system(cmd,ignore.stdout = !VERBOSE, ignore.stderr = !VERBOSE))[3]
 		##
