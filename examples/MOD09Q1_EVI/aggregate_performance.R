@@ -3,18 +3,18 @@ sink("aggregate_performance.log")
 
 RASDAMAN_ARRAYNAME = "MOD09Q1"
 
-ITERATIONS = 1 #5
-NSERVER = 12
-NT = 1  
-NM = c(100,1000,4800)
-VERBOSE=T
+#ITERATIONS = 1 #5
+#NSERVER = 12
+#NT = 1  
+#NM = c(100,1000,4800)
+#VERBOSE=T
 
 ## Pars for server test:
-# ITERATIONS = 5
-# NSERVER = 12
-# NT = 1  # or more?
-# NM = c(100,250,500,1000,1500,2000,2500,3000,4000,4800)
-# VERBOSE=T
+ITERATIONS = 5
+NSERVER = 4
+NT = 45  # or more?
+NM = c(100,250,500,1000,1500,2000,2500,3000,3500,4000,4500,4800)
+VERBOSE=T
 
 
 
@@ -40,6 +40,27 @@ system("rascontrol -q -x down srv N9 -kill",ignore.stdout = !VERBOSE, ignore.std
 Sys.sleep(3)
 
 
+
+# Test
+#rasql -q 'select sdom(MOD09Q1) from MOD09Q1' --out string
+	
+#rasql -q 'select max_cells(2.5d * (((double)img[0:4799,0:4799,1].nir - (double)img[0:4799,0:4799,1].red) / (10000d+2.4d*(double)img[0:4799,0:4799,1].red +(double)img[0:4799,0:4799,1].nir))) from MOD09Q1 as img' --out string
+		
+		
+		
+#rasql -q 'select max_cells(img[1:4800,1:4800,1].red) from MOD09Q1 as img' --out string
+#rasql -q 'select min_cells(img[1:4800,1:4800,1].red) from MOD09Q1 as img' --out string
+# rasql -q 'select max_cells(img[1:4800,1:4800,1].nir) from MOD09Q1 as img' --out string
+# rasql -q 'select min_cells(img[1:4800,1:4800,1].nir) from MOD09Q1 as img' --out string
+# rasql -q 'select avg_cells((float)img[0:4799,0:4799,1].red) from MOD09Q1 as img' --out string
+# #rasql -q 'select add_cells((float)img[0:4799,0:4799,1].nir) / (4800f*4800f) from MOD09Q1 as img' --out string
+# rasql -q 'select (img[1,1,1]) from MOD09Q1 as img' --out string
+# rasql -q 'select (img[0,0,1]) from MOD09Q1 as img' --out string
+# rasql -q 'select (max_cells(((double)(img[0:4799,0:4799,1].red)) - ((double)(img[0:4799,0:4799,1].nir)))) from MOD09Q1 as img' --out string ## ERROR
+# rasql -q 'select (((double)(img[4799,4799,1].red)) - ((double)(img[4799,4799,1].nir))) from MOD09Q1 as img' --out string ## ERROR
+#rasql -q 'select (2.5d * (((double)img[0:4799,0:4799,1].nir - (double)img[0:4799,0:4799,1].red) / (10000d+2.4d*(double)img[0:4799,0:4799,1].red +(double)img[0:4799,0:4799,1].nir)))[1,1] from MOD09Q1 as img' --out string
+#rasql -q 'select max_cells(2.5d * (((double)img[0:4799,0:4799,1].nir - (double)img[0:4799,0:4799,1].red) / (10000d+2.4d*(double)img[0:4799,0:4799,1].red +(double)img[0:4799,0:4799,1].nir))) from MOD09Q1 as img' --out string
+			
 
 
 
@@ -102,8 +123,8 @@ for (i in 1:length(NM)) {
 	ct <- 0
 	cat("USING IMAGE SIZE", NM[i], "x", NM[i], "- POINTS IN TIME", NT, "-", NSERVER , "RUNNING SERVERS ")
 	for (z in 1:ITERATIONS) {
-		targetdims = paste(0, ":" , NM[i]-1 , ",", 0, ":" , NM[i]-1 , ",0:",  NT-1 ,sep="")
-		cmd = paste("rasql -q 'select max_cells(2.5f * (img[", targetdims ,"].nir - img[", targetdims ,"].red) / (1f+2.4f*img[", targetdims ,"].red +img[", targetdims ,"].nir)) from ", RASDAMAN_ARRAYNAME ," as img' --out none" , sep="" )
+		targetdims = paste(0, ":" , NM[i]-1 , ",", 0, ":" , NM[i]-1 , ",1:",  NT ,sep="")
+		cmd = paste("rasql -q 'select max_cells(2.5d * ((double)(img[", targetdims ,"].nir) - (double)(img[", targetdims ,"].red)) / (10000d+2.4d*(double)(img[", targetdims ,"].red) +(double)(img[", targetdims ,"].nir))) from ", RASDAMAN_ARRAYNAME ," as img' --out none" , sep="" )
 		ct <- ct + system.time(system(cmd,ignore.stdout = !VERBOSE, ignore.stderr = !VERBOSE))[3]
 		##
 		#cmd = paste("rasql -q 'select encode((2.5f * (img[", targetdims ,"].nir - img[", targetdims ,"].red) / (1f+2.4f*img[", targetdims ,"].red +img[", targetdims ,"].nir)),\"netCDF\") from ", RASDAMAN_ARRAYNAME ," as img' --out file --outfile MOD09Q1_EVI " , sep="" )

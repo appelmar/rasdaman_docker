@@ -10,6 +10,7 @@ ENV RMANHOME /opt/rasdaman/
 ENV HOSTNAME rasdaman-dev1
 ENV JAVA_HOME /usr/lib/jvm/java-6-openjdk
 ENV R_LIBS /home/rasdaman/R
+ENV RASDATA ${RMANHOME}data 
 
 RUN locale-gen en_US.UTF-8
 ENV LANG en_US.UTF-8
@@ -19,14 +20,13 @@ RUN env
 
 
 # Install required software 
-RUN apt-get -qq update && apt-get install --fix-missing -y --force-yes \
+RUN apt-get -qq update && apt-get install --no-install-recommends --fix-missing -y --force-yes \
 	ssh \
 	openssh-server \
 	sudo \
 	wget \
 	gdebi \
 	git \
-	git-core \
 	make \
 	autoconf \
 	automake \
@@ -35,7 +35,6 @@ RUN apt-get -qq update && apt-get install --fix-missing -y --force-yes \
 	flex \
 	bison \
 	g++ \
-	doxygen \
 	ant \
 	autotools-dev \
 	comerr-dev \
@@ -47,24 +46,19 @@ RUN apt-get -qq update && apt-get install --fix-missing -y --force-yes \
 	python-gdal \
 	libncurses5-dev \
 	libnetpbm10-dev \
-	libffi-dev \
-	libreadline-dev \
 	libtool \
 	m4 \
 	postgresql-9.1 \
 	openjdk-6-jdk \
-	libsigsegv-dev \
-	libedit-dev \
 	libtiff-dev \
 	libjpeg8-dev \
 	libpng12-dev \
 	libnetpbm10-dev \
 	libhdf4-alt-dev \
 	libnetcdf-dev \
-	libsigsegv-dev \
-	vim \
 	supervisor \
 	libproj-dev \ 
+	libedit-dev \
 	nano
 
 # Install latest R version  # Not required if R package MODIS is not used, older version via apt is sufficient then
@@ -99,12 +93,27 @@ RUN echo 'StrictHostKeyChecking no' >> /etc/ssh/ssh_config
 # Download and build rasdaman
 RUN mkdir /home/rasdaman/install && git clone -q git://kahlua.eecs.jacobs-university.de/rasdaman.git  /home/rasdaman/install
 WORKDIR /home/rasdaman/install
-#RUN git checkout v9.0.5 # uncomment this if you want a tagged rasdaman version
-RUN autoreconf -fi  && ./configure --prefix=$RMANHOME --with-netcdf --with-hdf4 --with-wardir=$WEBAPPS_HOME
-#RUN autoreconf -fi  && ./configure --prefix=$RMANHOME --with-netcdf --with-hdf4 --with-wardir=$WEBAPPS_HOME --with-default-basedb=sqlite #--with-default-basedb=sqlite
-RUN make 
-RUN make install
 
+# Dependencies of rasnet protocol # TODO
+#RUN apt-get install --fix-missing -y --force-yes --no-install-recommends libprotobuf-dev libzmq-dev protobuf-compiler libboost-all-dev
+
+
+
+## 2015-01-29: BUGFIX WITH libsqlite3 (make fails because -lsqlite3 is set before objects)
+RUN cp /usr/lib/x86_64-linux-gnu/libsqlite* /usr/lib/ # is this really neccessary?
+RUN sed -i 's!LDFLAGS="$LDFLAGS $SQLITE3_LDFLAGS"!LDADD="$LDADD $SQLITE3_LDFLAGS"!' configure.ac
+####
+
+
+#RUN git checkout v9.0.5 # uncomment this if you want a tagged rasdaman version
+RUN autoreconf -fi  && LIBS="-lsqlite3" ./configure --prefix=$RMANHOME --with-netcdf --with-hdf4 --with-wardir=$WEBAPPS_HOME --with-default-basedb=sqlite --with-filedatadir=${RMANHOME}data
+
+#--enable-rasnet # TODO
+
+RUN make && make install
+
+
+RUN mkdir $RASDATA && chown rasdaman $RASDATA 
 
 
 # Some neccessary rasdaman adjustments
