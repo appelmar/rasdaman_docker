@@ -61,16 +61,22 @@ RUN apt-get -qq update && apt-get install --no-install-recommends --fix-missing 
 	libedit-dev \
 	nano
 
+
+
+
 # Install latest R version  # Not required if R package MODIS is not used, older version via apt is sufficient then
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E084DAB9 && echo "deb http://cran.rstudio.com/bin/linux/ubuntu precise/" >> /etc/apt/sources.list
-RUN apt-get update && apt-get install --fix-missing -y --force-yes r-base
+RUN apt-get update && apt-get install --fix-missing -y --force-yes r-base r-base-dev
+RUN R CMD javareconf && Rscript --vanilla -e 'install.packages(c("rJava", "testthat"), repos="http://cran.rstudio.com/")'
+
+# Install RStudio Server 
+RUN wget http://download2.rstudio.org/rstudio-server-0.98.1102-amd64.deb && gdebi -n rstudio-server-0.98.1102-amd64.deb
 
 
 # Install Tomcat6
 RUN wget -t 3 -w 2 ftp://ftp.fu-berlin.de/unix/www/apache/tomcat/tomcat-6/v6.0.43/bin/apache-tomcat-6.0.43.tar.gz
 RUN tar -xzf apache-tomcat-6.0.43.tar.gz
 RUN mv apache-tomcat-6.0.43 /opt/tomcat6
-
 
 
 # create rasdaman user with credentials: rasdaman:rasdaman
@@ -106,11 +112,13 @@ RUN sed -i 's!LDFLAGS="$LDFLAGS $SQLITE3_LDFLAGS"!LDADD="$LDADD $SQLITE3_LDFLAGS
 
 
 #RUN git checkout v9.0.5 # uncomment this if you want a tagged rasdaman version
-RUN autoreconf -fi  && LIBS="-lsqlite3" ./configure --prefix=$RMANHOME --with-netcdf --with-hdf4 --with-wardir=$WEBAPPS_HOME --with-default-basedb=sqlite --with-filedatadir=${RMANHOME}data
+RUN autoreconf -fi  && LIBS="-lsqlite3" ./configure --prefix=$RMANHOME --with-netcdf --with-hdf4 --with-wardir=$WEBAPPS_HOME --with-default-basedb=sqlite --enable-r --with-filedatadir=${RMANHOME}data
 
 #--enable-rasnet # TODO
 
 RUN make && make install
+RUN make --directory=applications/RRasdaman/ && make install --directory=applications/RRasdaman/
+
 
 
 RUN mkdir $RASDATA && chown rasdaman $RASDATA 
@@ -146,7 +154,6 @@ RUN echo "export RMANHOME=$RMANHOME" >> /etc/profile \
 
 	
 	
-	
 # SETUP RASGEO EXTENSTION # 
 
 RUN mkdir /home/rasdaman/.rasdaman 
@@ -172,6 +179,6 @@ RUN chown -R rasdaman /home/rasdaman
 RUN mkdir /opt/shared /opt/modisdata # TODO: Add environment variable for shared folder
 RUN chmod -R 0777 /opt/shared /opt/modisdata # Allow all users writing to shared folder # This does not work yet, maybe rights for volumes are reset during docker run?
 
-EXPOSE 7001 8080 22 5432
+EXPOSE 7001 8080 22 5432 8787
 
 CMD ["/usr/bin/supervisord"]
