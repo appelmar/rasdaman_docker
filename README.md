@@ -21,7 +21,7 @@ A Docker image for running Rasdaman including petascope and rasgeo extensions.
 5. Run `sudo ./install.sh`.
 6. The image will be built and a corresponding container will be created automatically. The container will be started automatically but might still need some seconds for first time initializations (e.g. web application deployment). You can now start and stop the container whenever you like via `sudo ./start.sh` and `sudo ./stop.sh` respectively.
 7. Once started, you can log in to the container via ssh using `ssh -p 21210 rasdaman@localhost`. Default password is "rasdaman".
-8. From the host machine, try to access the Petascope interface or RStudio using the URL `http://localhost:21211/rasdaman/ows/` and `http://localhost:21215/' respectively.
+8. From the host machine, try to access the Petascope interface or RStudio using the URL `http://localhost:21211/rasdaman/ows/` and `http://localhost:21215/` respectively.
 
 
 
