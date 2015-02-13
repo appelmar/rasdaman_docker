@@ -164,7 +164,7 @@ rasql -q 'select encode(
 
 
 		
-# Much nicer but also affected to memory / crash behavior
+# Much nicer:
 rasql -q 'select encode(marray prec_mae in [ sdom(TRMM)[0].lo:sdom(TRMM)[0].hi, sdom(TRMM)[1].lo:sdom(TRMM)[1].hi ] values condense + over y in [sdom(TRMM)[2].lo:sdom(TRMM)[2].hi] using TRMM[prec_mae[0], prec_mae[1], y[0]].precipitation - avg_cells(TRMM[prec_mae[0], prec_mae[1], *:*] ) / 3f, "GTiff") from TRMM' --out file --outfile TRMM_mae
 	
 # test with limited number of pixels
