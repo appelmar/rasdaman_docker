@@ -1,0 +1,88 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Rasdaman docker by mappl</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Rasdaman docker</h1>
+        <p>A Docker image for running Rasdaman including petascope and rasgeo extensions</p>
+
+        <p class="view"><a href="https://github.com/mappl/rasdaman_docker">View the Project on GitHub <small>mappl/rasdaman_docker</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/mappl/rasdaman_docker/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/mappl/rasdaman_docker/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/mappl/rasdaman_docker">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>
+<a id="rasdaman_docker" class="anchor" href="#rasdaman_docker" aria-hidden="true"><span class="octicon octicon-link"></span></a>rasdaman_docker</h1>
+
+<p>A Docker image for running Rasdaman including petascope and rasgeo extensions.</p>
+
+<h1>
+<a id="news" class="anchor" href="#news" aria-hidden="true"><span class="octicon octicon-link"></span></a>News</h1>
+
+<ul>
+<li>(2015-02-13) RStudio Server added for client access to RRasdaman </li>
+<li>(2015-02-13) RRasdaman package building added</li>
+<li>(2015-02-13) Rasgeo commands are currently not working due to file system blob storage </li>
+<li>(2015-02-13) Now works with file system blob storage</li>
+</ul>
+
+<h1>
+<a id="prerequisites" class="anchor" href="#prerequisites" aria-hidden="true"><span class="octicon octicon-link"></span></a>Prerequisites</h1>
+
+<ul>
+<li><a href="https://www.docker.com/">Docker</a></li>
+<li>At least 16 gigabytes free disk space</li>
+</ul>
+
+<h1>
+<a id="instructions" class="anchor" href="#instructions" aria-hidden="true"><span class="octicon octicon-link"></span></a>Instructions</h1>
+
+<ol>
+<li>If not yet done, install Docker, e.g. by <code>sudo apt-get update &amp;&amp; sudo apt-get install docker.io</code> or similar depending on your OS.</li>
+<li>Download the source e.g. by <code>git clone https://github.com/mappl/rasdaman_docker</code> </li>
+<li>Make relevant scripts executable <code>chmod +x install.sh start.sh stop.sh</code>.</li>
+<li>If you do not want to use the default settings for docker image and container names, hostnames, and port mapping, you may want to edit the docker run command in install.sh</li>
+<li>Run <code>sudo ./install.sh</code>.</li>
+<li>The image will be built and a corresponding container will be created automatically. The container will be started automatically but might still need some seconds for first time initializations (e.g. web application deployment). You can now start and stop the container whenever you like via <code>sudo ./start.sh</code> and <code>sudo ./stop.sh</code> respectively.</li>
+<li>Once started, you can log in to the container via ssh using <code>ssh -p 21210 rasdaman@localhost</code>. Default password is "rasdaman".</li>
+<li>From the host machine, try to access the Petascope interface or RStudio using the URL <code>http://localhost:21211/rasdaman/ows</code> and <code>http://localhost:21215/</code> respectively.</li>
+</ol>
+
+<h1>
+<a id="limitations" class="anchor" href="#limitations" aria-hidden="true"><span class="octicon octicon-link"></span></a>Limitations</h1>
+
+<p>This is a preliminary version, open issues include the following:</p>
+
+<ul>
+<li>Rasgeo extension currently not working as it cannot connect to file system storage</li>
+<li>Rasdaman server configuration is not yet editable as install.sh arguments</li>
+<li>Docker run parameters like port mappings, hostnames, and mounted volumes are not yet editable as install.sh arguments</li>
+<li>Data directory of BLOBS is currently not accessible for the host system</li>
+</ul>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/mappl">mappl</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
